@@ -1,9 +1,7 @@
-from django.db import models
-
-from django.db import models
 
 from django.db import models
 from django.core.exceptions import ValidationError
+from django.contrib.auth.models import User
 
 
 class Card(models.Model):
@@ -23,7 +21,7 @@ class Card(models.Model):
         ('DE', 'German'),
         # add more as needed
     ]
-
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=50)
     set_code = models.CharField(max_length=3)
     language = models.CharField(max_length=2, choices=LANGUAGE_CHOICES)
