@@ -9,7 +9,7 @@ class CardCreateView(CreateView):
     model = Card
     form_class = CardForm
     template_name = 'vault/card_form.html'
-    success_url = reverse_lazy('card-create')
+    success_url = reverse_lazy('card-list')
 
     def form_valid(self, form):
         form.instance.user = self.request.user
