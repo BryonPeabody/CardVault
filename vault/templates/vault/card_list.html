@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h2>Card List</h2>
+    <ul>
+        {% for card in cards %}
+            <li>
+                {{card.name}}
+            </li>
+        {% empty %}
+            <li>No cards in vault</li>
+        {% endfor %}
+    </ul>
+
+    <a href="{% url 'card-create' %}">Add a card to your vault</a>
+
+{% endblock %}
