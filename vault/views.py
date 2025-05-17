@@ -2,10 +2,12 @@ from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from .models import Card
 from .forms import CardForm
-from django.views.generic import CreateView, ListView, UpdateView, DeleteView
+from django.views.generic import CreateView, UpdateView, DeleteView, ListView
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 
-class CardCreateView(CreateView):
+class CardCreateView(LoginRequiredMixin, CreateView):
     model = Card
     form_class = CardForm
     template_name = 'vault/card_form.html'
@@ -16,7 +18,7 @@ class CardCreateView(CreateView):
         return super().form_valid(form)
 
 
-class CardListView(ListView):
+class CardListView(LoginRequiredMixin, ListView):
     model = Card
     template_name = 'vault/card_list.html'
     context_object_name = 'cards'
@@ -25,7 +27,7 @@ class CardListView(ListView):
         return Card.objects.filter(user=self.request.user)
 
 
-class CardUpdateView(UpdateView):
+class CardUpdateView(LoginRequiredMixin, UpdateView):
     model = Card
     form_class = CardForm
     template_name = 'vault/card_form.html'
@@ -35,7 +37,7 @@ class CardUpdateView(UpdateView):
         return Card.objects.filter(user=self.request.user)
 
 
-class CardDeleteView(DeleteView):
+class CardDeleteView(LoginRequiredMixin, DeleteView):
     model = Card
     template_name = 'vault/card_delete.html'
     success_url = reverse_lazy('card-list')
@@ -44,3 +46,7 @@ class CardDeleteView(DeleteView):
         return Card.objects.filter(user=self.request.user)
 
 
+class RegisterView(CreateView):
+    form_class = UserCreationForm
+    template_name = "vault/register.html"
+    success_url = reverse_lazy('login')
