@@ -6,6 +6,7 @@
             <li>
                 {{card.name}}
                 <a href="{% url 'card-update' %}">Update</a>
+                <a href="{% url 'card-delete' %}">Remove from vault</a>
 
             </li>
         {% empty %}

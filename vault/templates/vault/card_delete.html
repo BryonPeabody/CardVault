@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h2>Delete Card</h2>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit">Remove card from vault</button>
+    </form>
+
+    <a href="{% url 'card-list' %}">Back to vault</a>
+
+{% endblock %}
