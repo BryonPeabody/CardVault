@@ -5,6 +5,8 @@
         {% for card in cards %}
             <li>
                 {{card.name}}
+                <a href="{% url 'card-update' %}">Update</a>
+
             </li>
         {% empty %}
             <li>No cards in vault</li>

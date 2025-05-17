@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from .models import Card
 from .forms import CardForm
-from django.views.generic import CreateView, ListView
+from django.views.generic import CreateView, ListView, UpdateView, DeleteView
 
 
 class CardCreateView(CreateView):
@@ -24,6 +24,15 @@ class CardListView(ListView):
     def get_queryset(self):
         return Card.objects.filter(user=self.request.user)
 
+
+class CardUpdateView(UpdateView):
+    model = Card
+    form_class = CardForm
+    template_name = 'vault/card_form.html'
+    success_url = reverse_lazy('card-list')
+
+    def get_queryset(self):
+        return Card.objects.filter(user=self.request.user)
 
 
 
