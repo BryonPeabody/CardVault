@@ -38,7 +38,7 @@ class CardUpdateView(UpdateView):
 class CardDeleteView(DeleteView):
     model = Card
     template_name = 'vault/card_delete.html'
-    success_url = reverse_lazy('card_list')
+    success_url = reverse_lazy('card-list')
 
     def get_queryset(self):
         return Card.objects.filter(user=self.request.user)
