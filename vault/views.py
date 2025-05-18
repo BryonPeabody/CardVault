@@ -5,6 +5,7 @@ from .forms import CardForm
 from django.views.generic import CreateView, UpdateView, DeleteView, ListView
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
+from .utils import fetch_card_data
 
 
 class CardCreateView(LoginRequiredMixin, CreateView):
@@ -15,6 +16,14 @@ class CardCreateView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.user = self.request.user
+
+        card_data = fetch_card_data(
+            form.instance.name,
+            form.instance.set_code
+        )
+
+        form.instance.image_url = card_data.get('image_url')
+        print(card_data)
         return super().form_valid(form)
 
 

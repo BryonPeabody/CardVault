@@ -5,6 +5,9 @@
         {% for card in cards %}
             <li>
                 {{card.name}}
+                {% if card.image_url %}
+                    <br><img src="{{ card.image_url }}" alt="{{ card.name }}" width="200">
+                {% endif %}
                 <a href="{% url 'card-update' card.pk %}">Update</a>
                 <a href="{% url 'card-delete' card.pk %}">Remove from vault</a>
 
