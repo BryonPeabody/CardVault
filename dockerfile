@@ -1,23 +1,25 @@
-# Use Ubuntu as base image
-FROM ubuntu:22.04
+# Use official Python slim image
+FROM python:3.12-slim
 
 # Set environment variables
-ENV DEBIAN_FRONTEND=noninteractive
 ENV PYTHONUNBUFFERED=1
-
-# Install Python and required packages
-RUN apt-get update && apt-get install -y \
-    python3 \
-    python3-pip \
-    python3-venv \
-    git \
-    && rm -rf /var/lib/apt/lists/*
-
-# Set working directory
 WORKDIR /app/CardVault
+
+# Install git
+RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
 
 # Clone the CardVault project
 RUN git clone https://github.com/BryonPeabody/CardVault.git .
+
+# Install dependencies
+RUN pip install --upgrade pip \
+    && pip install -r requirements.txt
+
+# Expose default Django port
+EXPOSE 8000
+
+# Default command: migrate DB and run server
+CMD ["sh", "-c", "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"]
 
 # Install Python dependencies
 RUN pip3 install --upgrade pip \
