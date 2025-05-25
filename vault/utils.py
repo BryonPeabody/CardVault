@@ -30,7 +30,7 @@ def fetch_card_data(name, set_code=None):
     if not data:
         return {}
 
-    card = data[1]  # Use the first match
+    card = data[0]  # Use the first match
 
     return {
         "name": card.get("name"),
