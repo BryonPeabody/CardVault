@@ -1,0 +1,17 @@
+asgiref==3.8.1
+black==25.1.0
+certifi==2025.4.26
+charset-normalizer==3.4.2
+click==8.2.1
+Django==5.2.1
+idna==3.10
+mypy_extensions==1.1.0
+packaging==25.0
+pathspec==0.12.1
+platformdirs==4.3.8
+requests==2.32.3
+SQLLite3HelperClass==1.2
+sqlparse==0.5.3
+tomli==2.2.1
+typing_extensions==4.13.2
+urllib3==2.4.0

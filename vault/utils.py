@@ -15,13 +15,17 @@ def fetch_card_data(name, set_code=None):
 
     # filter to cards that match the set_code based on ID prefix
     if set_code:
-        data = [card for card in data if card.get('id', '').lower().startswith(set_code.lower() + '-')]
+        data = [
+            card
+            for card in data
+            if card.get("id", "").lower().startswith(set_code.lower() + "-")
+        ]
 
     if not data:
         return {}
 
     # Prefer cards with an image
-    data = [card for card in data if card.get('image')]
+    data = [card for card in data if card.get("image")]
 
     if not data:
         return {}
@@ -29,7 +33,8 @@ def fetch_card_data(name, set_code=None):
     card = data[0]  # Use the first match
 
     return {
-        'name': card.get('name'),
-        'image_url': card.get('image') + '/high.png',  # requires the added string for image
-        'card_id': card.get('id'),
+        "name": card.get("name"),
+        "image_url": card.get("image")
+        + "/high.png",  # requires the added string for image
+        "card_id": card.get("id"),
     }

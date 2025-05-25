@@ -1,4 +1,3 @@
-
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
@@ -6,19 +5,19 @@ from django.contrib.auth.models import User
 
 class Card(models.Model):
     CONDITION_CHOICES = [
-        ('M', 'Mint'),
-        ('NM', 'Near Mint'),
-        ('LP', 'Lightly Played'),
-        ('MP', 'Moderately Played'),
-        ('HP', 'Heavily Played'),
-        ('D', 'Damaged'),
+        ("M", "Mint"),
+        ("NM", "Near Mint"),
+        ("LP", "Lightly Played"),
+        ("MP", "Moderately Played"),
+        ("HP", "Heavily Played"),
+        ("D", "Damaged"),
     ]
 
     LANGUAGE_CHOICES = [
-        ('EN', 'English'),
-        ('JP', 'Japanese'),
-        ('FR', 'French'),
-        ('DE', 'German'),
+        ("EN", "English"),
+        ("JP", "Japanese"),
+        ("FR", "French"),
+        ("DE", "German"),
         # add more as needed
     ]
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -29,7 +28,9 @@ class Card(models.Model):
     condition = models.CharField(max_length=2, choices=CONDITION_CHOICES)
 
     image_url = models.URLField(blank=True, null=True)
-    value_usd = models.DecimalField(max_digits=8, decimal_places=2, blank=True, null=True)
+    value_usd = models.DecimalField(
+        max_digits=8, decimal_places=2, blank=True, null=True
+    )
 
     def save(self, *args, **kwargs):
         self.name = self.name.strip()
@@ -37,15 +38,16 @@ class Card(models.Model):
         super().save(*args, **kwargs)
 
     def clean(self):
-        if Card.objects.filter(
+        if (
+            Card.objects.filter(
                 name__iexact=self.name,
                 set_code__iexact=self.set_code,
-                card_number=self.card_number
-        ).exclude(pk=self.pk).exists():
+                card_number=self.card_number,
+            )
+            .exclude(pk=self.pk)
+            .exists()
+        ):
             raise ValidationError("This card already exists (case-insensitive match).")
 
     def __str__(self):
         return f"{self.name} ({self.set_code} #{self.card_number})"
-
-
-

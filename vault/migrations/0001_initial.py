@@ -15,17 +15,60 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='Card',
+            name="Card",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=50)),
-                ('set_code', models.CharField(max_length=3)),
-                ('language', models.CharField(choices=[('EN', 'English'), ('JP', 'Japanese'), ('FR', 'French'), ('DE', 'German')], max_length=2)),
-                ('card_number', models.CharField(max_length=10)),
-                ('condition', models.CharField(choices=[('M', 'Mint'), ('NM', 'Near Mint'), ('LP', 'Lightly Played'), ('MP', 'Moderately Played'), ('HP', 'Heavily Played'), ('D', 'Damaged')], max_length=2)),
-                ('image_url', models.URLField(blank=True, null=True)),
-                ('value_usd', models.DecimalField(blank=True, decimal_places=2, max_digits=8, null=True)),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=50)),
+                ("set_code", models.CharField(max_length=3)),
+                (
+                    "language",
+                    models.CharField(
+                        choices=[
+                            ("EN", "English"),
+                            ("JP", "Japanese"),
+                            ("FR", "French"),
+                            ("DE", "German"),
+                        ],
+                        max_length=2,
+                    ),
+                ),
+                ("card_number", models.CharField(max_length=10)),
+                (
+                    "condition",
+                    models.CharField(
+                        choices=[
+                            ("M", "Mint"),
+                            ("NM", "Near Mint"),
+                            ("LP", "Lightly Played"),
+                            ("MP", "Moderately Played"),
+                            ("HP", "Heavily Played"),
+                            ("D", "Damaged"),
+                        ],
+                        max_length=2,
+                    ),
+                ),
+                ("image_url", models.URLField(blank=True, null=True)),
+                (
+                    "value_usd",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=8, null=True
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
     ]
