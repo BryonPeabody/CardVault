@@ -14,7 +14,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Set working directory
-WORKDIR /app
+WORKDIR /app/CardVault
 
 # Clone the CardVault project
 RUN git clone https://github.com/BryonPeabody/CardVault.git .
