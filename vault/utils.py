@@ -22,7 +22,7 @@ def fetch_card_data(name, set_code=None, card_number=None):
         ]
 
     if not data:
-        return {}
+        return { }
 
     if card_number:
         card_number = str(card_number).strip()
