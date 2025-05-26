@@ -17,7 +17,7 @@ class CardCreateView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         form.instance.user = self.request.user
 
-        card_data = fetch_card_data(form.instance.name, form.instance.set_code)
+        card_data = fetch_card_data(form.instance.name, form.instance.set_code, form.instance.card_number)
 
         form.instance.image_url = card_data.get("image_url")
         print(card_data)

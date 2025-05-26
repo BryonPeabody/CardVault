@@ -1,7 +1,7 @@
 import requests
 
 
-def fetch_card_data(name, set_code=None):
+def fetch_card_data(name, set_code=None, card_number=None):
     url = f"https://api.tcgdex.net/v2/en/cards?name={name}"
     response = requests.get(url)
 
@@ -23,6 +23,15 @@ def fetch_card_data(name, set_code=None):
 
     if not data:
         return {}
+
+    if card_number:
+        card_number = str(card_number).strip()
+        data = [card for card in data if card.get("id", "").lower().endswith(f"-{card_number}")]
+
+    data = [
+        card for card in data
+        if card.get("id", "").lower().endswith(f"-{card_number}")
+    ]
 
     # Prefer cards with an image
     data = [card for card in data if card.get("image")]
