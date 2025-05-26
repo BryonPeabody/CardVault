@@ -25,6 +25,12 @@ urlpatterns = [
     path("cards/", include("vault.urls")),
     path("accounts/", include("django.contrib.auth.urls")),
     path("register/", RegisterView.as_view(), name="register"),
-
-    path("", lambda request: redirect("login", permanent=False))
+    path("", redirect_to_login),
 ]
+
+
+def redirect_to_login(request):
+    """
+    given a request if no path is given the default will be the login page
+    """
+    return redirect("login", permanent=False)
