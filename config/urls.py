@@ -18,10 +18,13 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from vault.views import RegisterView
+from django.shortcuts import redirect
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("cards/", include("vault.urls")),
     path("accounts/", include("django.contrib.auth.urls")),
     path("register/", RegisterView.as_view(), name="register"),
+
+    path("", lambda request: redirect("login", permanent=False))
 ]
