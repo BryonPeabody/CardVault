@@ -26,11 +26,14 @@ def fetch_card_data(name, set_code=None, card_number=None):
 
     if card_number:
         card_number = str(card_number).strip()
-        data = [card for card in data if card.get("id", "").lower().endswith(f"-{card_number}")]
+        data = [
+            card
+            for card in data
+            if card.get("id", "").lower().endswith(f"-{card_number}")
+        ]
 
     data = [
-        card for card in data
-        if card.get("id", "").lower().endswith(f"-{card_number}")
+        card for card in data if card.get("id", "").lower().endswith(f"-{card_number}")
     ]
 
     # Prefer cards with an image
