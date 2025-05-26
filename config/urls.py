@@ -20,6 +20,14 @@ from django.urls import path, include
 from vault.views import RegisterView
 from django.shortcuts import redirect
 
+
+def redirect_to_login(request):
+    """
+    given a request if no path is given the default will be the login page
+    """
+    return redirect("login", permanent=False)
+
+
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("cards/", include("vault.urls")),
@@ -27,10 +35,3 @@ urlpatterns = [
     path("register/", RegisterView.as_view(), name="register"),
     path("", redirect_to_login),
 ]
-
-
-def redirect_to_login(request):
-    """
-    given a request if no path is given the default will be the login page
-    """
-    return redirect("login", permanent=False)
