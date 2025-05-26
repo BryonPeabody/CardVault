@@ -42,6 +42,20 @@ class CardUpdateView(LoginRequiredMixin, UpdateView):
     def get_queryset(self):
         return Card.objects.filter(user=self.request.user)
 
+    def form_valid(self):
+        form.instance.user = self.request.user
+
+        card_data = fetch_card_data(
+            name=form.cleaned_data.get("name"),
+            set_code=form.cleaned_data.get("set_code"),
+            card_number=form.cleaned_data.get("card_number")
+        )
+
+        if card_data:
+            form.instance.image_url = card_data.get("image_url")
+
+        return super().form_valid()
+
 
 class CardDeleteView(LoginRequiredMixin, DeleteView):
     model = Card
