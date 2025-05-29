@@ -80,5 +80,4 @@ def set_api_key(request):
         api_key = request.POST.get("apiKey")
         if api_key:
             os.environ["CARDVAULT_API_KEY"] = api_key
-            print(f"API Key set to: {api_key}")  # Temporary for debugging
     return redirect("card-list")
