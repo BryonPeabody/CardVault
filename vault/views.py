@@ -6,6 +6,7 @@ from django.views.generic import CreateView, UpdateView, DeleteView, ListView
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .utils import fetch_card_data
+import os
 
 
 class CardCreateView(LoginRequiredMixin, CreateView):
@@ -72,3 +73,12 @@ class RegisterView(CreateView):
     form_class = UserCreationForm
     template_name = "vault/register.html"
     success_url = reverse_lazy("login")
+
+
+def set_api_key(request):
+    if request.method == "POST":
+        api_key = request.POST.get("apiKey")
+        if api_key:
+            os.environ["CARDVAULT_API_KEY"] = api_key
+            print(f"API Key set to: {api_key}")  # Temporary for debugging
+    return redirect("card-list")
