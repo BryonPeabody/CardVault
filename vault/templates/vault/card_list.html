@@ -1,16 +1,26 @@
 {% extends "base.html" %}
+
 {% block content %}
+    <!-- API Key Form -->
+    <div style="float: right; margin-top: -40px;">
+        <form method="POST" action="{% url 'set_api_key' %}">
+            {% csrf_token %}
+            <label for="apiKey">API Key:</label><br>
+            <input type="text" id="apiKey" name="apiKey" style="width: 200px;" required><br><br>
+            <button type="submit">Set Key</button>
+        </form>
+    </div>
+
     <h2>Card List</h2>
     <ul>
         {% for card in cards %}
             <li>
-                {{card.name}}
+                {{ card.name }}
                 {% if card.image_url %}
                     <br><img src="{{ card.image_url }}" alt="{{ card.name }}" width="200">
                 {% endif %}
                 <a href="{% url 'card-update' card.pk %}">Update</a>
                 <a href="{% url 'card-delete' card.pk %}">Remove from vault</a>
-
             </li>
         {% empty %}
             <li>No cards in vault</li>
