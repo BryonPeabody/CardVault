@@ -22,7 +22,6 @@ def fetch_card_data(name, set_code=None, card_number=None):
         ]
 
     if not data:
-        print("no data")
         return {}
 
     if card_number:

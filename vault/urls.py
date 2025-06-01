@@ -1,5 +1,6 @@
 from django.urls import path
-from vault.views import CardCreateView, CardListView, CardUpdateView, CardDeleteView
+from vault.views import CardCreateView, CardListView, CardUpdateView, CardDeleteView, test_api_key, hello
+
 
 urlpatterns = [
     path("create/", CardCreateView.as_view(), name="card-create"),

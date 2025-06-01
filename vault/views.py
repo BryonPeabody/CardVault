@@ -6,6 +6,8 @@ from django.views.generic import CreateView, UpdateView, DeleteView, ListView
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .utils import fetch_card_data
+from django.conf import settings
+from django.http import HttpResponse
 
 
 class CardCreateView(LoginRequiredMixin, CreateView):
@@ -44,7 +46,7 @@ class CardUpdateView(LoginRequiredMixin, UpdateView):
     def get_queryset(self):
         return Card.objects.filter(user=self.request.user)
 
-    def form_valid(self):
+    def form_valid(self, form):
         form.instance.user = self.request.user
 
         card_data = fetch_card_data(
