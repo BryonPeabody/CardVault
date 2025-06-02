@@ -1,6 +1,7 @@
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
+from django.utils import timezone
 
 
 class Card(models.Model):
@@ -50,6 +51,7 @@ class Card(models.Model):
     value_usd = models.DecimalField(
         max_digits=8, decimal_places=2, blank=True, null=True
     )
+    price_last_updated = models.DateField(blank=True, null=True)
 
     def save(self, *args, **kwargs):
         self.name = self.name.strip()
