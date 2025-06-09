@@ -1,6 +1,9 @@
 import requests
 from django.conf import settings
 from datetime import datetime
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def fetch_card_data(name, set_code=None, card_number=None):
@@ -62,16 +65,18 @@ def normalize_set_code_for_api(set_code):
 
 
 def fetch_card_price(card_name, set_code):
+    api_key = getattr(settings, "CARDVAULT_API_KEY", None)
+    if not api_key:
+        logger.warning("CARDVAULT_API_KEY missing - skipping price fetch.")
+        return {"error": "Missing API key"}
+
     url = "https://www.pokemonpricetracker.com/api/v1/prices"
-    headers = {"Authorization": f"Bearer {settings.CARDVAULT_API_KEY}"}
+    headers = {"Authorization": f"Bearer {api_key}"}
 
     set_code = normalize_set_code_for_api(set_code)
     params = {"setId": set_code, "name": card_name}
 
     response = requests.get(url, headers=headers, params=params)
-
-    # debug
-    print("debug url:", response.url)
 
     if response.status_code == 200:
         return response.json()
@@ -80,14 +85,12 @@ def fetch_card_price(card_name, set_code):
 
 
 def extract_card_price(data, name, number, set_code):
+    if not data or "data" not in data:
+        logger.warning("no valid pricing data provided to extract_card_price.")
+        return {"error": "No data received from price API"}
+
     set_code = normalize_set_code_for_api(set_code)
     for card in data.get("data", []):
-        print("DEBUG CARD:", card.get("name"), card.get("number"), card.get("id"))
-
-        print("🔎 Comparing:")
-        print("name:", card.get("name"), "==", name)
-        print("number:", card.get("number"), "==", number)
-        print("id:", card.get("id", ""), "startswith", set_code)
 
         if (
             card.get("name") == name
