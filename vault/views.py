@@ -109,7 +109,7 @@ class CardUpdateView(LoginRequiredMixin, UpdateView):
         if card_data:
             form.instance.image_url = card_data.get("image_url")
 
-        return super().form_valid()
+        return super().form_valid(form)
 
 
 class CardDeleteView(LoginRequiredMixin, DeleteView):
