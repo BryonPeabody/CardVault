@@ -35,8 +35,8 @@ DEBUG = os.getenv("DEBUG", "False") == "True"
 if not DEBUG:
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False
     X_FRAME_OPTIONS = 'DENY'
     SECURE_HSTS_SECONDS = 31536000
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
@@ -61,6 +61,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -147,4 +148,6 @@ LOGIN_REDIRECT_URL = "/cards/"
 LOGOUT_REDIRECT_URL = "login"
 
 CARDVAULT_API_KEY = os.getenv("CARDVAULT_API_KEY")
+
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
