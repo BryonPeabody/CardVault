@@ -59,9 +59,28 @@ def fetch_card_data(name, set_code=None, card_number=None):
 
 # needed for pricing api as it accepts sv3 instead of sv03 for filtering
 def normalize_set_code_for_api(set_code):
-    if set_code.startswith("sv0") and len(set_code) == 4:
-        return "sv" + set_code[-1]  # e.g. sv03 → sv3
-    return set_code
+    print(f"Original set_code: {set_code}")
+    for i, char in enumerate(set_code):
+        if char.isdigit():
+            prefix = set_code[:i]
+            suffix = set_code[i:]
+            break
+    else:
+        return set_code
+
+    print(f"Prefix: {prefix}, Suffix before normalization: {suffix}")
+
+    if "." in suffix:
+        whole, decimal = suffix.split(".")
+        print(f"Whole before int: {whole}, Decimal: {decimal}")
+        whole = str(int(whole))
+        suffix = whole + "pt" + decimal
+    else:
+        suffix = str(int(suffix))
+
+    normalized = prefix + suffix
+    print(f"Normalized set_code: {normalized}")
+    return normalized
 
 
 def fetch_card_price(card_name, set_code):
@@ -93,7 +112,7 @@ def extract_card_price(data, name, number, set_code):
     for card in data.get("data", []):
 
         if (
-            card.get("name") == name
+            card.get("name", "").lower() == name.lower()
             and card.get("number") == number
             and card.get("id", "").startswith(set_code)
         ):
@@ -110,3 +129,13 @@ def extract_card_price(data, name, number, set_code):
                 print("ERROR GETTING PRICE:", e)
                 return {"error": "Price data missing"}
     return {"error": "Card not found"}
+
+
+def fetch_sets():
+    api_key = getattr(settings, "CARDVAULT_API_KEY", None)
+    headers = {"Authorization": f"Bearer {api_key}"}
+    response = requests.get(
+        "https://www.pokemonpricetracker.com/api/v1/sets", headers=headers
+    )
+    sets = response.json()
+    print(sets)

@@ -1,32 +1,33 @@
-# Use official Python slim image
-FROM python:3.12-slim
+# Use official Python 3.11 slim image
+FROM python:3.11-slim
 
 # Set environment variables
+ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
-WORKDIR /app/CardVault
 
-# Install git
-RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
+# Set work directory inside the container
+WORKDIR /CardVault
 
-# Clone the CardVault project
-RUN git clone https://github.com/BryonPeabody/CardVault.git .
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    libpq-dev \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
 
-# Install dependencies
+# Install pip + Python deps
+COPY requirements.txt /CardVault/
 RUN pip install --upgrade pip \
     && pip install -r requirements.txt
 
-# Expose default Django port
+# Copy project files
+COPY . /CardVault
+
+# Collect static files
+RUN python manage.py collectstatic --noinput
+
+# Expose port 8000 for the dev server
 EXPOSE 8000
 
-# Default command: migrate DB and run server
-CMD ["sh", "-c", "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"]
-
-# Install Python dependencies
-RUN pip3 install --upgrade pip \
-    && pip3 install -r requirements.txt
-
-# Expose default Django port
-EXPOSE 8000
-
-# Default command: collect static files, migrate DB, run server
-CMD ["sh", "-c", "python3 manage.py migrate && python3 manage.py runserver 0.0.0.0:8000"]
+# Default command
+CMD ["gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8000"]

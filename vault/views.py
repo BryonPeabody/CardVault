@@ -61,7 +61,7 @@ class CardCreateView(LoginRequiredMixin, CreateView):
         price_api_data = fetch_card_price(form.instance.name, form.instance.set_code)
 
         # debug: check api response
-        print("raw price api data:", price_api_data)
+        # print("raw price api data:", price_api_data)
         print("data key present:", "data" in price_api_data)
         print("data length:", len(price_api_data.get("data", [])))
 
@@ -109,7 +109,7 @@ class CardUpdateView(LoginRequiredMixin, UpdateView):
         if card_data:
             form.instance.image_url = card_data.get("image_url")
 
-        return super().form_valid()
+        return super().form_valid(form)
 
 
 class CardDeleteView(LoginRequiredMixin, DeleteView):
