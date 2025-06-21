@@ -7,9 +7,11 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .utils import fetch_card_data, fetch_card_price, extract_card_price
 from django.conf import settings
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 import requests
 
+def health_check(request):
+    return HttpResponse("OK", status=200)
 
 def test_card_price_view(request):
     api_data = fetch_card_price("Charizard V", "swsh3")
