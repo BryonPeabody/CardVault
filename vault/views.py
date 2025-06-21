@@ -10,8 +10,10 @@ from django.conf import settings
 from django.http import JsonResponse, HttpResponse
 import requests
 
+
 def health_check(request):
     return HttpResponse("OK", status=200)
+
 
 def test_card_price_view(request):
     api_data = fetch_card_price("Charizard V", "swsh3")

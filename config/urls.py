@@ -34,5 +34,5 @@ urlpatterns = [
     path("accounts/", include("django.contrib.auth.urls")),
     path("register/", RegisterView.as_view(), name="register"),
     path("", redirect_to_login),
-    path("healthz/", health_check, name="healthz")
+    path("healthz/", health_check, name="healthz"),
 ]
