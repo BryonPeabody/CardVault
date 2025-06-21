@@ -17,7 +17,7 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path, include
-from vault.views import RegisterView
+from vault.views import RegisterView, health_check
 from django.shortcuts import redirect
 
 
@@ -34,4 +34,5 @@ urlpatterns = [
     path("accounts/", include("django.contrib.auth.urls")),
     path("register/", RegisterView.as_view(), name="register"),
     path("", redirect_to_login),
+    path("healthz/", health_check, name="healthz"),
 ]
