@@ -89,7 +89,7 @@ def fetch_card_price(card_name, set_code):
         logger.warning("CARDVAULT_API_KEY missing - skipping price fetch.")
         return {"error": "Missing API key"}
 
-    url = "https://www.pokemonpricetracker.com/api/v1/prices"
+    url = "https://www.pokemonpricetracker.com/api/prices"
     headers = {"Authorization": f"Bearer {api_key}"}
 
     set_code = normalize_set_code_for_api(set_code)
