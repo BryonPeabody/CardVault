@@ -5,6 +5,10 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+"""
+price api wants sv6-6, image api wants sv06-006
+"""
+
 
 def fetch_card_data(name, set_code=None, card_number=None):
     url = f"https://api.tcgdex.net/v2/en/cards?name={name}"

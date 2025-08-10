@@ -38,7 +38,6 @@ class Card(models.Model):
         ("sv10", "Destined Rivals"),
         ("sv10.5b", "Black Bolt"),
         ("sv10.5w", "White Flare"),
-        ("svp", "Scarlet & Violet Promos"),
         ("swsh12", "Silver Tempest"),
         ("swsh12.5", "Crown Zenith"),
     ]
