@@ -44,7 +44,7 @@ class Card(models.Model):
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=50)
-    set_code = models.CharField(max_length=10, choices=SET_CHOICES)
+    set_code = models.CharField(max_length=25, choices=SET_CHOICES)
     language = models.CharField(max_length=2, choices=LANGUAGE_CHOICES)
     card_number = models.CharField(max_length=10)
     condition = models.CharField(max_length=2, choices=CONDITION_CHOICES)
