@@ -1,47 +1,35 @@
 
-
-IMAGE_SET_MAP = {
-    "Silver Tempest": "swsh12",
-    "Crown Zenith": "swsh12.5",
-    "Scarlet & Violet Base": "sv01",
-    "Paldea Evolved": "sv02",
-    "Obsidian Flames": "sv03",
-    "151": "sv03.5",
-    "Paradox Rift": "sv04",
-    "Paldean Fates": "sv04.5",
-    "Temporal Forces": "sv05",
-    "Twilight Masquerade": "sv06",
-    "Shrouded Fable": "sv06.5",
-    "Stellar Crown": "sv07",
-    "Surging Sparks": "sv08",
-    "Prismatic Evolutions": "sv08.5",
-    "Journey Together": "sv09",
-    "Destined Rivals": "sv10",
-    "Black Bolt": "sv10.5b",
-    "White Flare": "sv10.5w",
+from typing import Dict, TypedDict, List, Tuple
 
 
+class ApiCodes(TypedDict):
+    image: str
+    price: str
+
+
+SETS: Dict[str, ApiCodes] = {
+    "Silver Tempest":        {"image": "swsh12", "price": "swsh12"},
+    "Crown Zenith":          {"image": "swsh12.5", "price": "swsh12pt5"},
+    "Scarlet & Violet Base": {"image": "sv01",   "price": "sv1"},
+    "Paldea Evolved":        {"image": "sv02",   "price": "sv2"},
+    "Obsidian Flames":       {"image": "sv03",   "price": "sv3"},
+    "151":                   {"image": "sv03.5", "price": "sv3pt5"},
+    "Paradox Rift":          {"image": "sv04",   "price": "sv4"},
+    "Paldean Fates":         {"image": "sv04.5", "price": "sv4pt5"},
+    "Temporal Forces":       {"image": "sv05",   "price": "sv5"},
+    "Twilight Masquerade":   {"image": "sv06",   "price": "sv6"},
+    "Shrouded Fable":        {"image": "sv06.5", "price": "sv6pt5"},
+    "Stellar Crown":         {"image": "sv07",   "price": "sv7"},
+    "Surging Sparks":        {"image": "sv08",   "price": "sv8"},
+    "Prismatic Evolutions":  {"image": "sv08.5", "price": "sv8pt5"},
+    "Journey Together":      {"image": "sv09",   "price": "sv9"},
+    "Destined Rivals":       {"image": "sv10",   "price": "sv10"},
+    "Black Bolt":            {"image": "sv10.5b", "price": "zsv10pt5"},
+    "White Flare":           {"image": "sv10.5w", "price": "rsv10pt5"},
 }
 
-PRICE_SET_MAP = {
-    "Silver Tempest": "swsh12",
-    "Crown Zenith": "swsh12pt5",
-    "Scarlet & Violet Base": "sv1",
-    "Paldea Evolved": "sv2",
-    "Obsidian Flames": "sv3",
-    "151": "sv3pt5",
-    "Paradox Rift": "sv4",
-    "Paldean Fates": "sv4pt5",
-    "Temporal Forces": "sv5",
-    "Twilight Masquerade": "sv6",
-    "Shrouded Fable": "sv6pt5",
-    "Stellar Crown": "sv7",
-    "Surging Sparks": "sv8",
-    "Prismatic Evolutions": "sv8pt5",
-    "Journey Together": "sv9",
-    "Destined Rivals": "sv10",
-    "Black Bolt": "zsv10pt5",
-    "White Flare": "rsv10pt5",
-}
-
+# Derived artifacts (don’t hand-edit below)
+SET_CHOICES: List[Tuple[str, str]] = [(name, name) for name in SETS.keys()]
+IMAGE_SET_MAP: Dict[str, str] = {name: codes["image"] for name, codes in SETS.items()}
+PRICE_SET_MAP: Dict[str, str] = {name: codes["price"] for name, codes in SETS.items()}
 
