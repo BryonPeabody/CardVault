@@ -43,8 +43,8 @@ class Card(models.Model):
     ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    name = models.CharField(max_length=50)
-    set_code = models.CharField(max_length=25, choices=SET_CHOICES)
+    card_name = models.CharField(max_length=50)
+    set_name = models.CharField(max_length=25, choices=SET_CHOICES)
     language = models.CharField(max_length=2, choices=LANGUAGE_CHOICES)
     card_number = models.CharField(max_length=10)
     condition = models.CharField(max_length=2, choices=CONDITION_CHOICES)
@@ -56,15 +56,15 @@ class Card(models.Model):
     price_last_updated = models.DateField(blank=True, null=True)
 
     def save(self, *args, **kwargs):
-        self.name = self.name.strip()
-        self.set_code = self.set_code.upper()
+        self.card_name = self.card_name.strip()
+        self.set_name = self.set_name.upper()
         super().save(*args, **kwargs)
 
     def clean(self):
         if (
             Card.objects.filter(
-                name__iexact=self.name,
-                set_code__iexact=self.set_code,
+                card_name__iexact=self.card_name,
+                set_name__iexact=self.set_name,
                 card_number=self.card_number,
             )
             .exclude(pk=self.pk)
@@ -73,4 +73,4 @@ class Card(models.Model):
             raise ValidationError("This card already exists (case-insensitive match).")
 
     def __str__(self):
-        return f"{self.name} ({self.set_code} #{self.card_number})"
+        return f"{self.card_name} ({self.set_name} #{self.card_number})"

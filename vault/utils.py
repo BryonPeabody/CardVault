@@ -16,7 +16,9 @@ def _pad_card_number_for_image(n: str | int) -> str:
     return s.zfill(3)
 
 
-def fetch_card_data(name: str, set_name: str, card_number: str | int | None = None):
+def fetch_card_data(
+    card_name: str, set_name: str, card_number: str | int | None = None
+):
     # use official set name and filter through map in constants to get api set_code
     set_code = IMAGE_SET_MAP.get(set_name)
     # graceful exit if set_code not found
@@ -27,7 +29,7 @@ def fetch_card_data(name: str, set_name: str, card_number: str | int | None = No
     try:
         url = "https://api.tcgdex.net/v2/en/cards"
         # safe timeout after 10 second if no data received
-        resp = requests.get(url, params={"name": name}, timeout=10)
+        resp = requests.get(url, params={"name": card_name}, timeout=10)
         # throws exception on bad request so we don't save a 404 page or the like
         resp.raise_for_status()
         # put data in json list if data is good
@@ -95,7 +97,9 @@ def fetch_card_price(card_name: str, set_name: str):
         return {"error": "Request failed"}
 
 
-def extract_card_price(data: dict, name: str, number: str | int, set_name: str):
+def extract_card_price(
+    data: dict, card_name: str, card_number: str | int, set_name: str
+):
     # make sure data from fetch_card_price is available to work on
     if not data or "data" not in data:
         logger.warning("No valid pricing data provided to extract_card_price.")
@@ -104,13 +108,13 @@ def extract_card_price(data: dict, name: str, number: str | int, set_name: str):
     set_code = PRICE_SET_MAP.get(set_name)
     if not set_code:
         return {"error": f"Unknown set for price api: {set_name}"}
-    number_str = str(number).strip()
+    number_str = str(card_number).strip()
     # dig through the dictionary
     for card in data.get("data", []):
         try:
             if (
                 # find the matching card
-                card.get("name", "").lower() == name.lower()
+                card.get("name", "").lower() == card_name.lower()
                 and str(card.get("number", "")).strip() == number_str
                 and str(card.get("id", "")).startswith(set_code)
             ):
