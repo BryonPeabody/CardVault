@@ -11,37 +11,6 @@ from django.http import JsonResponse, HttpResponse
 import requests
 
 
-def health_check(request):
-    return HttpResponse("OK", status=200)
-
-
-def test_card_price_view(request):
-    api_data = fetch_card_price("Charizard V", "swsh3")
-    parsed = extract_card_price(api_data, "Charizard V", "19", "swsh3")
-    return JsonResponse(parsed)
-
-
-def test_charizard_sv03(request):
-    url = "https://www.pokemonpricetracker.com/api/v1/prices"
-    headers = {"Authorization": f"Bearer {settings.CARDVAULT_API_KEY}"}
-    params = {"setId": "sv3", "name": "Charizard ex"}
-
-    response = requests.get(url, headers=headers, params=params)
-    data = response.json()
-    print("DEBUG API RAW:", data)
-
-    return JsonResponse(data)  # Just dump it back to browser
-
-
-def test_get_all_sets(request):
-    url = "https://www.pokemonpricetracker.com/api/v1/sets"
-    headers = {"Authorization": f"Bearer {settings.CARDVAULT_API_KEY}"}
-
-    response = requests.get(url, headers=headers)
-    print("DEBUG SET RESPONSE:", response.json())
-    return JsonResponse(response.json(), safe=False)
-
-
 class CardCreateView(LoginRequiredMixin, CreateView):
     model = Card
     form_class = CardForm
@@ -52,30 +21,30 @@ class CardCreateView(LoginRequiredMixin, CreateView):
         form.instance.user = self.request.user
 
         card_data = fetch_card_data(
-            form.instance.name, form.instance.set_code, form.instance.card_number
+            form.instance.card_name,
+            form.instance.set_name,
+            form.instance.card_number,
         )
 
         form.instance.image_url = card_data.get("image_url")
 
         # debug: see what im sending
-        print("sending name:", form.instance.name)
-        print("sending set_code:", form.instance.set_code)
+        print("sending card_name:", form.instance.card_name)
+        print("sending set_name:", form.instance.set_name)
         print("sending card_number", form.instance.card_number)
-
-        price_api_data = fetch_card_price(form.instance.name, form.instance.set_code)
-
+        price_api_data = fetch_card_price(
+            form.instance.card_name, form.instance.set_name
+        )
         # debug: check api response
         # print("raw price api data:", price_api_data)
         print("data key present:", "data" in price_api_data)
         print("data length:", len(price_api_data.get("data", [])))
-
         parsed = extract_card_price(
             price_api_data,
-            form.instance.name,
+            form.instance.card_name,
             form.instance.card_number,
-            form.instance.set_code,
+            form.instance.set_name,
         )
-
         if parsed and "price" in parsed:
             form.instance.value_usd = parsed["price"]
             form.instance.price_last_updated = parsed["price_date"]
@@ -105,8 +74,8 @@ class CardUpdateView(LoginRequiredMixin, UpdateView):
         form.instance.user = self.request.user
 
         card_data = fetch_card_data(
-            name=form.cleaned_data.get("name"),
-            set_code=form.cleaned_data.get("set_code"),
+            card_name=form.cleaned_data.get("card_name"),
+            set_name=form.cleaned_data.get("set_name"),
             card_number=form.cleaned_data.get("card_number"),
         )
 
@@ -129,3 +98,38 @@ class RegisterView(CreateView):
     form_class = UserCreationForm
     template_name = "vault/register.html"
     success_url = reverse_lazy("login")
+
+
+# ----------------------------------test views------------------------------
+# likely no longer necessary because I found out about postman
+
+
+def health_check(request):
+    return HttpResponse("OK", status=200)
+
+
+def test_card_price_view(request):
+    api_data = fetch_card_price("Charizard V", "swsh3")
+    parsed = extract_card_price(api_data, "Charizard V", "19", "swsh3")
+    return JsonResponse(parsed)
+
+
+def test_charizard_sv03(request):
+    url = "https://www.pokemonpricetracker.com/api/v1/prices"
+    headers = {"Authorization": f"Bearer {settings.CARDVAULT_API_KEY}"}
+    params = {"setId": "sv3", "name": "Charizard ex"}
+
+    response = requests.get(url, headers=headers, params=params)
+    data = response.json()
+    print("DEBUG API RAW:", data)
+
+    return JsonResponse(data)  # Just dump it back to browser
+
+
+def test_get_all_sets(request):
+    url = "https://www.pokemonpricetracker.com/api/v1/sets"
+    headers = {"Authorization": f"Bearer {settings.CARDVAULT_API_KEY}"}
+
+    response = requests.get(url, headers=headers)
+    print("DEBUG SET RESPONSE:", response.json())
+    return JsonResponse(response.json(), safe=False)
