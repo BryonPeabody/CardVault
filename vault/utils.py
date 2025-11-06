@@ -70,8 +70,7 @@ def fetch_card_data(
 def fetch_card_price(card_name: str, set_name: str):
     # the price API requires a key hidden in .env
     api_key = getattr(settings, "CARDVAULT_API_KEY", None)
-    # if someone uses this on github and cannot access my key this will fail gracefully unless they
-    # add their own
+    # if someone uses this on github and cannot access my key this will fail gracefully unless they add their own
     if not api_key:
         logger.warning("CARDVAULT_API_KEY missing - skipping price fetch.")
         return {"error": "Missing API key"}
