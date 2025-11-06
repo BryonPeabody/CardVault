@@ -100,36 +100,10 @@ class RegisterView(CreateView):
     success_url = reverse_lazy("login")
 
 
-# ----------------------------------test views------------------------------
-# likely no longer necessary because I found out about postman
+# ----------------------------------test helper
 
 
 def health_check(request):
     return HttpResponse("OK", status=200)
 
 
-def test_card_price_view(request):
-    api_data = fetch_card_price("Charizard V", "swsh3")
-    parsed = extract_card_price(api_data, "Charizard V", "19", "swsh3")
-    return JsonResponse(parsed)
-
-
-def test_charizard_sv03(request):
-    url = "https://www.pokemonpricetracker.com/api/v1/prices"
-    headers = {"Authorization": f"Bearer {settings.CARDVAULT_API_KEY}"}
-    params = {"setId": "sv3", "name": "Charizard ex"}
-
-    response = requests.get(url, headers=headers, params=params)
-    data = response.json()
-    print("DEBUG API RAW:", data)
-
-    return JsonResponse(data)  # Just dump it back to browser
-
-
-def test_get_all_sets(request):
-    url = "https://www.pokemonpricetracker.com/api/v1/sets"
-    headers = {"Authorization": f"Bearer {settings.CARDVAULT_API_KEY}"}
-
-    response = requests.get(url, headers=headers)
-    print("DEBUG SET RESPONSE:", response.json())
-    return JsonResponse(response.json(), safe=False)
