@@ -126,4 +126,101 @@ def test_card_create_view_creates_card(monkeypatch, user):
     assert float(card.value_usd) == 10.50
 
 
+# --------------- update view tests
 
+
+@pytest.mark.django_db
+def test_card_update_view_redirects_non_logged_in_user(user):
+    client = Client()
+
+    card = Card.objects.create(
+        user=user,
+        card_name="Bulbasaur",
+        set_name="151",
+        language="EN",
+        card_number="1",
+        condition="M",
+    )
+    url = reverse("card-update", args=[card.pk])
+    response = client.get(url)
+
+    assert response.status_code == 302
+    assert "/login" in response.url
+
+
+@pytest.mark.django_db
+def test_card_update_view_updates_a_card(user):
+    """ Ensure a logged in user can update a card in the database """
+    client = Client()
+    client.force_login(user)
+
+    # Create original card
+    card = Card.objects.create(
+        user=user,
+        card_name="Bulbasaur",
+        set_name="151",
+        language="EN",
+        card_number="1",
+        condition="M",
+    )
+
+    # Get to update screen on the created card
+    url = reverse("card-update", args=[card.pk])
+
+    # Set data for updated card
+    updated_data = {
+        "card_name": "Pikachu",
+        # Set name must be one of the valid choices in constants.py or form.is_valid will fail and we will not redirect
+        "set_name": "151",
+        "language": "EN",
+        "card_number": "10",
+        "condition": "NM",
+    }
+
+    # Post updated data to the update url
+    response = client.post(url, data=updated_data)
+
+    # Ensure expected redirect
+    assert response.status_code == 302
+    assert response.url == reverse("card-list")
+
+    # Ensure card is updated in database
+    card.refresh_from_db()
+    assert card.card_name == "Pikachu"
+    assert card.card_number == "10"
+    assert card.condition == "NM"
+
+
+@pytest.mark.django_db
+def test_logged_in_user_cannot_update_another_users_card(user):
+    """ Ensure logged in user can not update a different user's card """
+    # Log in user
+    client = Client()
+    client.force_login(user)
+
+    # Create second user
+    other_user = user.__class__.objects.create_user(username="otherUser", password="pass123")
+
+    # Create card owned by second user
+    card = Card.objects.create(
+        user=other_user,
+        card_name="Bulbasaur",
+        card_number="1",
+        language="EN",
+        set_name="151",
+        condition="NM",
+    )
+
+    # Attempt to pull update form for second user's card for logged in user
+    url = reverse("card-update", args=[card.pk])
+    response = client.get(url)
+
+    # Ensure the card is filtered out of logged in user data and page does not render
+    assert response.status_code == 404
+
+
+# ----------------- delete view tests
+
+
+@pytest.mark.django_db
+def
