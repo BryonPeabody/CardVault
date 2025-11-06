@@ -7,7 +7,6 @@ from django.utils import timezone
 from vault.models import Card
 
 
-
 @pytest.mark.django_db
 def test_card_str_returns_name(user):
     """Checks that the __str__ method returns the card name."""
@@ -68,4 +67,3 @@ def test_card_clean_prevents_duplicate_cards(user):
         duplicate.clean()
 
     assert "already exists" in str(excinfo.value)
-

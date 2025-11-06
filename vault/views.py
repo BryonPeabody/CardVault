@@ -105,5 +105,3 @@ class RegisterView(CreateView):
 
 def health_check(request):
     return HttpResponse("OK", status=200)
-
-

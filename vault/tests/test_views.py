@@ -62,7 +62,7 @@ def test_card_list_view_redirects_if_not_logged_in():
 
 @pytest.mark.django_db
 def test_card_create_view_renders_form_for_logged_in_user(user):
-    """ Logged in user can visit card create form """
+    """Logged in user can visit card create form"""
     client = Client()
     client.force_login(user)
 
@@ -75,7 +75,7 @@ def test_card_create_view_renders_form_for_logged_in_user(user):
 
 @pytest.mark.django_db
 def test_card_create_view_redirects_if_not_logged_in():
-    """ Non-Logged in user is redirected to login page"""
+    """Non-Logged in user is redirected to login page"""
     client = Client()
     url = reverse("card-create")
     response = client.get(url)
@@ -85,7 +85,7 @@ def test_card_create_view_redirects_if_not_logged_in():
 
 @pytest.mark.django_db
 def test_card_create_view_creates_card(monkeypatch, user):
-    """ Logged in user can create a card """
+    """Logged in user can create a card"""
     client = Client()
     client.force_login(user)
 
@@ -150,7 +150,7 @@ def test_card_update_view_redirects_non_logged_in_user(user):
 
 @pytest.mark.django_db
 def test_card_update_view_updates_a_card(user):
-    """ Ensure a logged in user can update a card in the database """
+    """Ensure a logged in user can update a card in the database"""
     client = Client()
     client.force_login(user)
 
@@ -193,13 +193,15 @@ def test_card_update_view_updates_a_card(user):
 
 @pytest.mark.django_db
 def test_logged_in_user_cannot_update_another_users_card(user):
-    """ Ensure logged in user can not update a different user's card """
+    """Ensure logged in user can not update a different user's card"""
     # Log in user
     client = Client()
     client.force_login(user)
 
     # Create second user
-    other_user = user.__class__.objects.create_user(username="otherUser", password="pass123")
+    other_user = user.__class__.objects.create_user(
+        username="otherUser", password="pass123"
+    )
 
     # Create card owned by second user
     card = Card.objects.create(
@@ -220,7 +222,3 @@ def test_logged_in_user_cannot_update_another_users_card(user):
 
 
 # ----------------- delete view tests
-
-
-@pytest.mark.django_db
-def
