@@ -222,3 +222,88 @@ def test_logged_in_user_cannot_update_another_users_card(user):
 
 
 # ----------------- delete view tests
+
+
+@pytest.mark.django_db
+def test_card_delete_view_reroutes_non_logged_in_user(user):
+    """Ensure a user must be logged in to delete a card or will be redirected to login"""
+    client = Client()
+
+    # Create a card in database
+    card = Card.objects.create(
+        user=user,
+        card_name="Bulbasaur",
+        card_number="1",
+        language="EN",
+        set_name="151",
+        condition="NM",
+    )
+
+    # Attempt a delete without login
+    url = reverse("card-delete", args=[card.pk])
+    response = client.post(url)
+
+    # Ensure proper redirect and that the card remains in db
+    assert response.status_code == 302
+    assert "/login" in response.url
+    assert Card.objects.filter(pk=card.pk).exists()
+
+
+@pytest.mark.django_db
+def test_logged_in_user_can_delete_a_card(user):
+    """Ensure a logged in user can delete their card"""
+
+    # Create and login a user
+    client = Client()
+    client.force_login(user)
+
+    # Create a card in database for user
+    card = Card.objects.create(
+        user=user,
+        card_name="Bulbasaur",
+        card_number="1",
+        language="EN",
+        set_name="151",
+        condition="NM",
+    )
+
+    # Attempt a delete of the card
+    url = reverse("card-delete", args=[card.pk])
+    response = client.post(url)
+
+    # Ensure proper redirect and the card is deleted
+    assert response.status_code == 302
+    expected_url = reverse("card-list")
+    assert response.url == expected_url
+    assert not Card.objects.filter(pk=card.pk).exists()
+
+
+@pytest.mark.django_db
+def test_user_cant_delete_different_users_card(user):
+    """Ensure a user can not delete another user's card"""
+    # Create and login user
+    client = Client()
+    client.force_login(user)
+
+    # Create second user
+    other_user = user.__class__.objects.create_user(
+        username="other_user", password="pass123"
+    )
+
+    # Create card in second user's db
+    foreign_card = Card.objects.create(
+        user=other_user,
+        card_name="Bulbasaur",
+        card_number="1",
+        language="EN",
+        set_name="151",
+        condition="NM",
+    )
+
+    # Attempt to delete from unauthorized first user
+    url = reverse("card-delete", args=[foreign_card.pk])
+    response = client.post(url)
+
+    # Ensure delete post fails
+    assert response.status_code == 404
+    assert Card.objects.filter(pk=foreign_card.pk).exists()
