@@ -7,6 +7,11 @@ from django.contrib.auth.models import User
 from django.test import Client
 from vault.models import Card
 
+""" 
+    When creating a card for tests, the set_name must be one of the sets listed in the constants.py file
+    or else card creation will fail.
+"""
+
 
 # --------------list view tests
 
@@ -63,12 +68,16 @@ def test_card_list_view_redirects_if_not_logged_in():
 @pytest.mark.django_db
 def test_card_create_view_renders_form_for_logged_in_user(user):
     """Logged in user can visit card create form"""
+
+    # Create and login a user
     client = Client()
     client.force_login(user)
 
+    # Attempt to see card creation form
     url = reverse("card-create")
     response = client.get(url)
 
+    # Ensure success
     assert response.status_code == 200
     assert "form" in response.context
 
@@ -77,8 +86,12 @@ def test_card_create_view_renders_form_for_logged_in_user(user):
 def test_card_create_view_redirects_if_not_logged_in():
     """Non-Logged in user is redirected to login page"""
     client = Client()
+
+    # Attempt to see card creation form without logging in a user
     url = reverse("card-create")
     response = client.get(url)
+
+    # Ensure it fails and redirects to login page
     assert response.status_code == 302
     assert "/login" in response.url
 
@@ -86,6 +99,8 @@ def test_card_create_view_redirects_if_not_logged_in():
 @pytest.mark.django_db
 def test_card_create_view_creates_card(monkeypatch, user):
     """Logged in user can create a card"""
+
+    # Create and login a user
     client = Client()
     client.force_login(user)
 
@@ -106,7 +121,6 @@ def test_card_create_view_creates_card(monkeypatch, user):
     # Post valid form data
     form_data = {
         "card_name": "Bulbasaur",
-        # Set name must be one of the valid choices in constants.py or form.is_valid will fail and we will not redirect
         "set_name": "151",
         "language": "EN",
         "card_number": "1",
@@ -170,7 +184,6 @@ def test_card_update_view_updates_a_card(user):
     # Set data for updated card
     updated_data = {
         "card_name": "Pikachu",
-        # Set name must be one of the valid choices in constants.py or form.is_valid will fail and we will not redirect
         "set_name": "151",
         "language": "EN",
         "card_number": "10",
