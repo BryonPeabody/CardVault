@@ -31,6 +31,4 @@ jobs:
         run: pylint vault || true
 
       - name: Run Pytest
-        env:
-          DJANGO_SETTINGS_MODULE: CardVault.settings
         run: pytest -v
