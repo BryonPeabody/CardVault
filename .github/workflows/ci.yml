@@ -32,5 +32,5 @@ jobs:
 
       - name: Run Pytest
         env:
-          DJANGO_SETTINGS_MODULE: cardvault.settings
+          DJANGO_SETTINGS_MODULE: CardVault.settings
         run: pytest -v
