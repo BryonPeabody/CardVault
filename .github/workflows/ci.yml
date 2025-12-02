@@ -31,4 +31,9 @@ jobs:
         run: pylint vault || true
 
       - name: Run Pytest
+        env:
+          DJANGO_SETTINGS_MODULE: config.settings
+          SECRET_KEY: "dummy-test-secret-key"
+          DATABASE_URL: "sqlite:///test_db.sqlite3"
         run: pytest -v
+
