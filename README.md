@@ -1,5 +1,6 @@
 # CardVault
 
+
 CardVault is a Django web application for tracking and valuing trading card collections.  
 It pulls **card images and market prices from external APIs** and lets users manage their collection in one place.
 
