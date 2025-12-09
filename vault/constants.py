@@ -7,7 +7,7 @@ class ApiCodes(TypedDict):
 
 
 SETS: Dict[str, ApiCodes] = {
-    "Silver Tempest": {"image": "swsh12", "price": "Silver Tempes"},
+    "Silver Tempest": {"image": "swsh12", "price": "Silver Tempest"},
     "Crown Zenith": {"image": "swsh12.5", "price": "Crown Zenith"},
     "Scarlet & Violet Base": {"image": "sv01", "price": "Scarlet & Violet Base"},
     "Paldea Evolved": {"image": "sv02", "price": "Paldea Evolved"},

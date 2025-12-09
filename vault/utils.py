@@ -81,9 +81,9 @@ def fetch_card_price(card_name: str, set_name: str):
         logger.error("Missing PRICE_SET_MAP code for set '%s'", set_name)
         return {"error": "Unknown set for price API"}
     # hit the API passing headers and params to access
-    url = "https://www.pokemonpricetracker.com/api/prices"
+    url = "https://www.pokemonpricetracker.com/api/v2/cards"
     headers = {"Authorization": f"Bearer {api_key}"}
-    params = {"setId": set_code, "name": card_name}
+    params = {"set": set_code, "search": card_name}
     try:
         resp = requests.get(url, headers=headers, params=params, timeout=10)
         # if all goes well, return json dictionary (how the API formats their data)
@@ -96,6 +96,44 @@ def fetch_card_price(card_name: str, set_name: str):
         return {"error": "Request failed"}
 
 
+def extract_card_price(data: dict, card_number: str | int):
+    # Safety: ensure API returned something usable
+    if not data or "data" not in data:
+        logger.warning("No valid pricing data provided to extract_card_price.")
+        return {"error": "No data received from price API"}
+
+    number_str = str(card_number).strip()
+
+    # Loop through all card variants in the response
+    for card in data.get("data", []):
+        try:
+            # v2 stores this field as "cardNumber" (e.g. "062/197")
+            if str(card.get("cardNumber", "")).startswith(number_str):
+                # Pull price data
+                price = card["prices"]["market"]
+
+                # lastUpdated is ISO 8601, not YYYY/MM/DD
+                raw_date = card["prices"]["lastUpdated"]
+                price_date = raw_date.split("T")[0]  # YYYY-MM-DD
+
+                return {
+                    "price": price,
+                    "price_date": price_date,
+                    # The following may be useful in future feature expansion
+                    # "tcgplayer_id": card.get("tcgPlayerId"),
+                    # "variant": card.get("rarity"),
+                }
+
+        except Exception as e:
+            logger.exception("Failed parsing a card variant: %s", e)
+            continue
+
+    return {"error": f"Card number {number_str} not found"}
+
+
+"""
+OLD V1 ARCHITECTURE 
+
 def extract_card_price(
     data: dict, card_name: str, card_number: str | int, set_name: str
 ):
@@ -107,6 +145,7 @@ def extract_card_price(
     set_code = PRICE_SET_MAP.get(set_name)
     if not set_code:
         return {"error": f"Unknown set for price api: {set_name}"}
+    
     number_str = str(card_number).strip()
     # dig through the dictionary
     for card in data.get("data", []):
@@ -126,3 +165,4 @@ def extract_card_price(
         except (KeyError, TypeError, ValueError):
             continue
     return {"error": "Card not found"}
+"""
