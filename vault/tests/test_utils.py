@@ -25,34 +25,26 @@ def test_extract_card_price_valid(monkeypatch):
         "data": [
             {
                 "name": "Bulbasaur",
-                "number": "1",
-                "id": "sv2a-001",
-                "cardmarket": {
-                    "prices": {"averageSellPrice": 12.34},
-                    "updatedAt": "2025/11/05",
-                },
+                "cardNumber": "1/165",
+                "prices": {
+                    "market": 12.34,
+                    "lastUpdated": "2025-11-05T10:00:00.000Z",
+                    }
             }
         ]
     }
 
-    result = extract_card_price(mock_data, "Bulbasaur", "1", "151")
+    result = extract_card_price(mock_data, "1")
 
     assert result["price"] == 12.34
-    assert result["price_date"] == date(2025, 11, 5)
+    assert result["price_date"] == "2025-11-05"
 
 
 def test_extract_card_price_no_data_key():
     """Should return error when data key missing"""
 
-    result = extract_card_price({}, "Bulbasaur", "1", "151")
+    result = extract_card_price({}, "1")
     assert result["error"] == "No data received from price API"
-
-
-def test_extract_card_price_unknown_set():
-    """Should return error when set name not in map."""
-
-    result = extract_card_price({"data": []}, "Bulbasaur", "1", "NonexistentSet")
-    assert "Unknown set" in result["error"]
 
 
 def test_extract_card_price_card_not_found(monkeypatch):
@@ -76,5 +68,5 @@ def test_extract_card_price_card_not_found(monkeypatch):
         ]
     }
 
-    result = extract_card_price(mock_data, "Bulbasaur", "1", "151")
+    result = extract_card_price(mock_data, "1")
     assert result["error"] == "Card not found"
