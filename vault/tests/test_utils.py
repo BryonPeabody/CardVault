@@ -19,40 +19,32 @@ def test_extract_card_price_valid(monkeypatch):
     # fake map since PRICE_SET_MAP is in another module
     from vault import utils
 
-    utils.PRICE_SET_MAP = {"151": "sv2a"}
+    utils.PRICE_SET_MAP = {"151": "151"}
 
     mock_data = {
         "data": [
             {
                 "name": "Bulbasaur",
-                "number": "1",
-                "id": "sv2a-001",
-                "cardmarket": {
-                    "prices": {"averageSellPrice": 12.34},
-                    "updatedAt": "2025/11/05",
+                "cardNumber": "001/165",
+                "prices": {
+                    "market": 12.34,
+                    "lastUpdated": "2025-11-05T10:00:00.000Z",
                 },
             }
         ]
     }
 
-    result = extract_card_price(mock_data, "Bulbasaur", "1", "151")
+    result = extract_card_price(mock_data, "1")
 
     assert result["price"] == 12.34
-    assert result["price_date"] == date(2025, 11, 5)
+    assert result["price_date"] == "2025-11-05"
 
 
 def test_extract_card_price_no_data_key():
     """Should return error when data key missing"""
 
-    result = extract_card_price({}, "Bulbasaur", "1", "151")
+    result = extract_card_price({}, "1")
     assert result["error"] == "No data received from price API"
-
-
-def test_extract_card_price_unknown_set():
-    """Should return error when set name not in map."""
-
-    result = extract_card_price({"data": []}, "Bulbasaur", "1", "NonexistentSet")
-    assert "Unknown set" in result["error"]
 
 
 def test_extract_card_price_card_not_found(monkeypatch):
@@ -60,21 +52,20 @@ def test_extract_card_price_card_not_found(monkeypatch):
 
     from vault import utils
 
-    utils.PRICE_SET_MAP = {"151": "sv2a"}
+    utils.PRICE_SET_MAP = {"151": "151"}
 
     mock_data = {
         "data": [
             {
                 "name": "Charmander",
-                "number": "5",
-                "id": "sv2a-005",
-                "cardmarket": {
-                    "prices": {"averageSellPrice": 7.77},
-                    "updatedAt": "2025/11/05",
+                "cardNumber": "005/165",
+                "prices": {
+                    "market": 15.15,
+                    "lastUpdated": "2025-11-05T10:00:00.000Z",
                 },
             }
         ]
     }
 
-    result = extract_card_price(mock_data, "Bulbasaur", "1", "151")
-    assert result["error"] == "Card not found"
+    result = extract_card_price(mock_data, "1")
+    assert result["error"] == "Card number 001 not found"

@@ -41,9 +41,7 @@ class CardCreateView(LoginRequiredMixin, CreateView):
         print("data length:", len(price_api_data.get("data", [])))
         parsed = extract_card_price(
             price_api_data,
-            form.instance.card_name,
             form.instance.card_number,
-            form.instance.set_name,
         )
         if parsed and "price" in parsed:
             form.instance.value_usd = parsed["price"]

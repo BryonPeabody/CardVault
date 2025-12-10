@@ -111,7 +111,7 @@ def test_card_create_view_creates_card(monkeypatch, user):
     def fake_fetch_card_price(card_name, set_name):
         return {"data": [{"price": 10.50, "date": "2025-11-05"}]}
 
-    def fake_extract_card_price(data, card_name, card_number, set_name):
+    def fake_extract_card_price(data, card_number):
         return {"price": 10.50, "price_date": "2025-11-05"}
 
     monkeypatch.setattr("vault.views.fetch_card_data", fake_fetch_card_data)
