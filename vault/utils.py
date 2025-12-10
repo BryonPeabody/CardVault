@@ -11,6 +11,8 @@ logger = logging.getLogger(__name__)
 def _pad_card_number_for_image(n: str | int) -> str:
     """
     TCGdex image id's use a 3-digit card number: ie, '006'
+    V2 of pokepricetracker endpoints also use this format for endpoints,
+    now using this helper for fetch_card_data (image) and extract_card_price (price)
     """
     s = str(n).strip()
     return s.zfill(3)
@@ -102,13 +104,13 @@ def extract_card_price(data: dict, card_number: str | int):
         logger.warning("No valid pricing data provided to extract_card_price.")
         return {"error": "No data received from price API"}
 
-    number_str = str(card_number).strip()
+    padded = _pad_card_number_for_image(card_number)
 
     # Loop through all card variants in the response
     for card in data.get("data", []):
         try:
             # v2 stores this field as "cardNumber" (e.g. "062/197")
-            if str(card.get("cardNumber", "")).startswith(number_str):
+            if str(card.get("cardNumber", "")).startswith(padded):
                 # Pull price data
                 price = card["prices"]["market"]
 
@@ -128,7 +130,7 @@ def extract_card_price(data: dict, card_number: str | int):
             logger.exception("Failed parsing a card variant: %s", e)
             continue
 
-    return {"error": f"Card number {number_str} not found"}
+    return {"error": f"Card number {padded} not found"}
 
 
 """

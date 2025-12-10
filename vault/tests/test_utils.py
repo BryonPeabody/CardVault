@@ -19,13 +19,13 @@ def test_extract_card_price_valid(monkeypatch):
     # fake map since PRICE_SET_MAP is in another module
     from vault import utils
 
-    utils.PRICE_SET_MAP = {"151": "sv2a"}
+    utils.PRICE_SET_MAP = {"151": "151"}
 
     mock_data = {
         "data": [
             {
                 "name": "Bulbasaur",
-                "cardNumber": "1/165",
+                "cardNumber": "001/165",
                 "prices": {
                     "market": 12.34,
                     "lastUpdated": "2025-11-05T10:00:00.000Z",
@@ -52,21 +52,20 @@ def test_extract_card_price_card_not_found(monkeypatch):
 
     from vault import utils
 
-    utils.PRICE_SET_MAP = {"151": "sv2a"}
+    utils.PRICE_SET_MAP = {"151": "151"}
 
     mock_data = {
         "data": [
             {
                 "name": "Charmander",
-                "number": "5",
-                "id": "sv2a-005",
-                "cardmarket": {
-                    "prices": {"averageSellPrice": 7.77},
-                    "updatedAt": "2025/11/05",
-                },
+                "cardNumber": "005/165",
+                "prices": {
+                    "market": 15.15,
+                    "lastUpdated": "2025-11-05T10:00:00.000Z",
+                    }
             }
         ]
     }
 
     result = extract_card_price(mock_data, "1")
-    assert result["error"] == "Card not found"
+    assert result["error"] == "Card number 001 not found"
