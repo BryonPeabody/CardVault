@@ -5,6 +5,7 @@ from .forms import CardForm
 from django.views.generic import CreateView, UpdateView, DeleteView, ListView
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import F
 from .utils import fetch_card_data, fetch_card_price, extract_card_price
 from django.conf import settings
 from django.http import JsonResponse, HttpResponse
@@ -56,7 +57,11 @@ class CardListView(LoginRequiredMixin, ListView):
     context_object_name = "cards"
 
     def get_queryset(self):
-        return Card.objects.filter(user=self.request.user)
+        return (
+            Card.objects
+            .filter(user=self.request.user)
+            .order_by(F("value_usd").desc(nulls_last=True), "card_name")
+        )
 
 
 class CardUpdateView(LoginRequiredMixin, UpdateView):
