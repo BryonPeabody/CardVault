@@ -29,7 +29,7 @@ def test_extract_card_price_valid(monkeypatch):
                 "prices": {
                     "market": 12.34,
                     "lastUpdated": "2025-11-05T10:00:00.000Z",
-                    }
+                },
             }
         ]
     }
@@ -62,7 +62,7 @@ def test_extract_card_price_card_not_found(monkeypatch):
                 "prices": {
                     "market": 15.15,
                     "lastUpdated": "2025-11-05T10:00:00.000Z",
-                    }
+                },
             }
         ]
     }
