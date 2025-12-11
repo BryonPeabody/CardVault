@@ -57,11 +57,16 @@ class CardListView(LoginRequiredMixin, ListView):
     context_object_name = "cards"
 
     def get_queryset(self):
-        return (
-            Card.objects
-            .filter(user=self.request.user)
-            .order_by(F("value_usd").desc(nulls_last=True), "card_name")
-        )
+        qs = Card.objects.filter(user=self.request.user)
+
+        sort = self.request.GET.get("sort", "value_desc")
+
+        if sort == "value_asc":
+            return qs.order_by("value_usd", "card_name")
+        elif sort == "value_desc":
+            return qs.order_by("-value_usd", "card_name")
+        else:
+            return qs.order_by("-value_usd", "card_name")
 
 
 class CardUpdateView(LoginRequiredMixin, UpdateView):

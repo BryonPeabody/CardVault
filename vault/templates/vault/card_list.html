@@ -1,10 +1,13 @@
 {% extends "base.html" %}
 {% block content %}
     <h2>Card List</h2>
+    <a href="?sort=value_desc">Sort by price: High to Low</a>
+    <a href="?sort=value_asc">Sort by price: Low to High</a>
+
     <ul>
         {% for card in cards %}
             <li>
-                {{card.name}}
+                {{card.card_name}}
                 {% if card.image_url %}
                     <br><img src="{{ card.image_url }}" alt="{{ card.card_name }}" width="200">
                 {% endif %}
