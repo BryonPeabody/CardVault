@@ -3,10 +3,13 @@
     <h2>Card List</h2>
     <a href="?sort=value_desc">Sort by price: High to Low</a>
     <a href="?sort=value_asc">Sort by price: Low to High</a>
+    <a href="?sort=set_asc">Sort by set: A → Z</a>
+    <a href="?sort=set_desc">Sort by set: Z → A</a>
 
-    <ul>
+
+    <li>
         {% for card in cards %}
-            <li>
+            <li style="margin-bottom: 20px;">
                 {{card.card_name}}
                 {% if card.image_url %}
                     <br><img src="{{ card.image_url }}" alt="{{ card.card_name }}" width="200">
@@ -26,7 +29,7 @@
         {% empty %}
             <li>No cards in vault</li>
         {% endfor %}
-    </ul>
+    </li>
 
     <a href="{% url 'card-create' %}">Add a card to your vault</a>
 

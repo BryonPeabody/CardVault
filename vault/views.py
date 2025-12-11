@@ -65,6 +65,10 @@ class CardListView(LoginRequiredMixin, ListView):
             return qs.order_by("value_usd", "card_name")
         elif sort == "value_desc":
             return qs.order_by("-value_usd", "card_name")
+        elif sort == "set_asc":
+            return qs.order_by("set_name", "card_number")
+        elif sort == "set_desc":
+            return qs.order_by("-set_name", "card_number")
         else:
             return qs.order_by("-value_usd", "card_name")
 
