@@ -53,3 +53,55 @@ button:hover {
 form {
     margin: 10px 0;
 }
+
+/* --- Card Grid Layout --- */
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 28px;
+    margin-top: 24px;
+    padding: 10px 0;
+}
+
+/* --- Individual Card Item --- */
+.card-item {
+    background: #ffffff;
+    padding: 18px;
+    border-radius: 12px;
+    text-align: center;
+
+    /* classy shadow */
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+
+    /* smooth hover lift */
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+/* Hover glow/lift */
+.card-item:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+}
+
+/* Space around card images */
+.card-item img {
+    max-width: 100%;
+    height: auto;
+    margin-bottom: 12px;
+    border-radius: 8px;
+}
+
+/* Price text styling */
+.card-item p {
+    margin: 8px 0;
+    font-size: 15px;
+}
+
+/* Action links inside card */
+.card-item a {
+    display: inline-block;
+    margin-top: 8px;
+    padding: 6px 10px;
+    border-radius: 6px;
+}
+

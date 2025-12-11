@@ -7,10 +7,11 @@
     <a href="?sort=set_desc">Sort by set: Z → A</a>
 
 
-    <li>
+    <div class="card-grid">
         {% for card in cards %}
-            <li style="margin-bottom: 20px;">
-                {{card.card_name}}
+            <div class="card-item">
+                <h3>{{card.card_name}}</h3>
+
                 {% if card.image_url %}
                     <br><img src="{{ card.image_url }}" alt="{{ card.card_name }}" width="200">
                 {% endif %}
@@ -21,15 +22,11 @@
                     <p><strong>Price:</strong> Not available</p>
                 {% endif %}
 
-
                 <a href="{% url 'card-update' card.pk %}">Update</a>
                 <a href="{% url 'card-delete' card.pk %}">Remove from vault</a>
-
-            </li>
-        {% empty %}
-            <li>No cards in vault</li>
+            </div>
         {% endfor %}
-    </li>
+    </div>
 
     <a href="{% url 'card-create' %}">Add a card to your vault</a>
 
