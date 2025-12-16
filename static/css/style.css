@@ -128,4 +128,12 @@ form {
     font-weight: 600;
 }
 
+.collection-total {
+    margin: 10px 0 18px;
+    font-size: 18px;
+    font-weight: 600;
+    color: #222;
+}
+
+
 

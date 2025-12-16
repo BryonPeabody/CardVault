@@ -1,6 +1,11 @@
 {% extends "base.html" %}
 {% block content %}
     <h2>Card List</h2>
+    <p class="collection-total">
+        <strong>Total collection value:</strong>
+        ${{ total_value_usd|floatformat:2 }}
+    </p>
+
     <a href="?sort=value_desc">Sort by price: High to Low</a>
     <a href="?sort=value_asc">Sort by price: Low to High</a>
     <a href="?sort=set_asc">Sort by set: A → Z</a>
