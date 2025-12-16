@@ -22,8 +22,11 @@
                     <p><strong>Price:</strong> Not available</p>
                 {% endif %}
 
-                <a href="{% url 'card-update' card.pk %}">Update</a>
-                <a href="{% url 'card-delete' card.pk %}">Remove from vault</a>
+                <div class="card-actions">
+                    <a href="{% url 'card-update' card.pk %}">Update</a>
+                    <a href="{% url 'card-delete' card.pk %}">Remove from vault</a>
+                </div>
+
             </div>
         {% endfor %}
     </div>
