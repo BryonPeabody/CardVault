@@ -6,10 +6,26 @@
         ${{ total_value_usd|floatformat:2 }}
     </p>
 
-    <a href="?sort=value_desc">Sort by price: High to Low</a>
-    <a href="?sort=value_asc">Sort by price: Low to High</a>
-    <a href="?sort=set_asc">Sort by set: A → Z</a>
-    <a href="?sort=set_desc">Sort by set: Z → A</a>
+    <form method="get" class="sort-form">
+        <label for="sort"><strong>Sort:</strong></label>
+
+        <select name="sort" id="sort" onchange="this.form.submit()">
+            <option value="value_desc" {% if current_sort == "value_desc" %}selected{% endif %}>
+                Price: High → Low
+            </option>
+            <option value="value_asc" {% if current_sort == "value_asc" %}selected{% endif %}>
+                Price: Low → High
+            </option>
+            <option value="set_asc" {% if current_sort == "set_asc" %}selected{% endif %}>
+                Set: A → Z
+            </option>
+            <option value="set_desc" {% if current_sort == "set_desc" %}selected{% endif %}>
+                Set: Z → A
+            </option>
+        </select>
+    </form>
+
+
 
 
     <div class="card-grid">

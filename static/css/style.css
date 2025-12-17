@@ -135,5 +135,25 @@ form {
     color: #222;
 }
 
+.sort-form {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 10px 0 18px;
+}
+
+.sort-form select {
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid #cfd8dc;
+    background: white;
+    font-size: 14px;
+}
+
+.sort-form label {
+    color: #222;
+    font-weight: 600;
+}
+
 
 

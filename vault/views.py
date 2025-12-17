@@ -5,7 +5,7 @@ from .forms import CardForm
 from django.views.generic import CreateView, UpdateView, DeleteView, ListView
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import F, Sum
+from django.db.models import Sum
 from django.db.models.functions import Coalesce
 from .utils import fetch_card_data, fetch_card_price, extract_card_price
 from django.conf import settings
@@ -76,6 +76,8 @@ class CardListView(LoginRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
+        context["current_sort"] = self.request.GET.get("sort", "value_desc")
 
         # Total value across the user's entire collection
         user_cards = Card.objects.filter(user=self.request.user)
