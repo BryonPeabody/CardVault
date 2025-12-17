@@ -1,12 +1,40 @@
 {% extends "base.html" %}
 {% block content %}
     <h2>Card List</h2>
-    <ul>
+    <p class="collection-total">
+        <strong>Total collection value:</strong>
+        ${{ total_value_usd|floatformat:2 }}
+    </p>
+
+    <form method="get" class="sort-form">
+        <label for="sort"><strong>Sort:</strong></label>
+
+        <select name="sort" id="sort" onchange="this.form.submit()">
+            <option value="value_desc" {% if current_sort == "value_desc" %}selected{% endif %}>
+                Price: High → Low
+            </option>
+            <option value="value_asc" {% if current_sort == "value_asc" %}selected{% endif %}>
+                Price: Low → High
+            </option>
+            <option value="set_asc" {% if current_sort == "set_asc" %}selected{% endif %}>
+                Set: A → Z
+            </option>
+            <option value="set_desc" {% if current_sort == "set_desc" %}selected{% endif %}>
+                Set: Z → A
+            </option>
+        </select>
+    </form>
+
+
+
+
+    <div class="card-grid">
         {% for card in cards %}
-            <li>
-                {{card.name}}
+            <div class="card-item">
+                <h3>{{card.card_name}}</h3>
+
                 {% if card.image_url %}
-                    <br><img src="{{ card.image_url }}" alt="{{ card.name }}" width="200">
+                    <br><img src="{{ card.image_url }}" alt="{{ card.card_name }}" width="200">
                 {% endif %}
 
                 {% if card.value_usd %}
@@ -15,15 +43,14 @@
                     <p><strong>Price:</strong> Not available</p>
                 {% endif %}
 
+                <div class="card-actions">
+                    <a href="{% url 'card-update' card.pk %}">Update</a>
+                    <a href="{% url 'card-delete' card.pk %}">Remove from vault</a>
+                </div>
 
-                <a href="{% url 'card-update' card.pk %}">Update</a>
-                <a href="{% url 'card-delete' card.pk %}">Remove from vault</a>
-
-            </li>
-        {% empty %}
-            <li>No cards in vault</li>
+            </div>
         {% endfor %}
-    </ul>
+    </div>
 
     <a href="{% url 'card-create' %}">Add a card to your vault</a>
 
