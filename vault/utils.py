@@ -5,6 +5,13 @@ import logging
 
 from .constants import IMAGE_SET_MAP, PRICE_SET_MAP
 
+# Price history imports
+from django.utils import timezone
+from decimal import Decimal
+from collections import defaultdict
+
+from .models import Card, PriceSnapshot
+
 logger = logging.getLogger(__name__)
 
 
@@ -69,7 +76,7 @@ def fetch_card_data(
     }
 
 
-def fetch_card_price(card_name: str, set_name: str):
+def fetch_card_price(card_name: str, set_name: str, fetch_all: bool = False):
     # the price API requires a key hidden in .env
     api_key = getattr(settings, "CARDVAULT_API_KEY", None)
     # if someone uses this on github and cannot access my key this will fail gracefully unless they add their own
@@ -85,7 +92,12 @@ def fetch_card_price(card_name: str, set_name: str):
     # hit the API passing headers and params to access
     url = "https://www.pokemonpricetracker.com/api/v2/cards"
     headers = {"Authorization": f"Bearer {api_key}"}
-    params = {"set": set_code, "search": card_name}
+    params = {"set": set_code}
+    if fetch_all:
+        params["fetchAllInSet"] = "true"
+    elif card_name:
+        params["search"] = card_name
+
     try:
         resp = requests.get(url, headers=headers, params=params, timeout=10)
         # if all goes well, return json dictionary (how the API formats their data)
@@ -133,38 +145,44 @@ def extract_card_price(data: dict, card_number: str | int):
     return {"error": f"Card number {padded} not found"}
 
 
-"""
-OLD V1 ARCHITECTURE 
+def refresh_prices_for_user(user) -> int:
+    today = timezone.localdate()
+    cards = Card.objects.filter(user=user)
 
-def extract_card_price(
-    data: dict, card_name: str, card_number: str | int, set_name: str
-):
-    # make sure data from fetch_card_price is available to work on
-    if not data or "data" not in data:
-        logger.warning("No valid pricing data provided to extract_card_price.")
-        return {"error": "No data received from price API"}
-    # and make sure we have a set code
-    set_code = PRICE_SET_MAP.get(set_name)
-    if not set_code:
-        return {"error": f"Unknown set for price api: {set_name}"}
-    
-    number_str = str(card_number).strip()
-    # dig through the dictionary
-    for card in data.get("data", []):
-        try:
-            if (
-                # find the matching card
-                card.get("name", "").lower() == card_name.lower()
-                and str(card.get("number", "")).strip() == number_str
-                and str(card.get("id", "")).startswith(set_code)
-            ):
-                # pull average sale price and the date updated for display
-                price = card["cardmarket"]["prices"]["averageSellPrice"]
-                raw_date = card["cardmarket"]["updatedAt"]  # YYYY/MM/DD
-                price_date = datetime.strptime(raw_date, "%Y/%m/%d").date()
-                return {"price": price, "price_date": price_date}
-        # or fail gracefully
-        except (KeyError, TypeError, ValueError):
+    # group cards by set_name
+    cards_by_set = defaultdict(list)
+    for card in cards:
+        cards_by_set[card.set_name].append(card)
+
+    updated = 0
+
+    for set_name, cards_in_set in cards_by_set.items():
+        # fetch once per set
+        # pick any card name just to seed the search
+        seed_card = cards_in_set[0]
+        data = fetch_card_price(seed_card.card_name, set_name, fetch_all=True)
+
+        if "error" in data:
             continue
-    return {"error": "Card not found"}
-"""
+
+        for card in cards_in_set:
+            result = extract_card_price(data, card.card_number)
+
+            if "error" in result:
+                continue
+
+            price = Decimal(str(result["price"]))
+
+            PriceSnapshot.objects.update_or_create(
+                card=card,
+                as_of_date=today,
+                defaults={"price": price},
+            )
+
+            card.value_usd = price
+            card.price_last_updated = today
+            card.save(update_fields=["value_usd", "price_last_updated"])
+
+            updated += 1
+
+    return updated
