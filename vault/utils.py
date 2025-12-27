@@ -163,12 +163,21 @@ def refresh_prices_for_user(user) -> int:
         data = fetch_card_price(seed_card.card_name, set_name, fetch_all=True)
 
         if "error" in data:
+            logger.warning(
+                "Fetch card price failed for set=%s seed_name=%s status=%s error=%s",
+                set_name,
+                seed_card.card_name,
+                data.get("status"),
+                data.get("error"),
+            )
             continue
 
         for card in cards_in_set:
             result = extract_card_price(data, card.card_number)
 
             if "error" in result:
+                logger.warning("Price extract failed for %s %s #%s: %s",
+                               card.card_name, card.set_name, card.card_number, result["error"])
                 continue
 
             price = Decimal(str(result["price"]))

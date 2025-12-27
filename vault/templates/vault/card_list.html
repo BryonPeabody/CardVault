@@ -5,6 +5,13 @@
         <strong>Total collection value:</strong>
         ${{ total_value_usd|floatformat:2 }}
     </p>
+    <form method="post" action="{% url 'refresh-prices' %}">
+        {% csrf_token %}
+        <button type="submit">
+            Refresh prices
+        </button>
+    </form>
+
 
     <form method="get" class="sort-form">
         <label for="sort"><strong>Sort:</strong></label>

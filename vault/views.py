@@ -5,9 +5,11 @@ from .forms import CardForm
 from django.views.generic import CreateView, UpdateView, DeleteView, ListView
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from django.db.models import Sum
 from django.db.models.functions import Coalesce
-from .utils import fetch_card_data, fetch_card_price, extract_card_price
+from .utils import fetch_card_data, fetch_card_price, extract_card_price, refresh_prices_for_user
 from django.conf import settings
 from django.http import JsonResponse, HttpResponse
 from decimal import Decimal
@@ -127,6 +129,13 @@ class RegisterView(CreateView):
     form_class = UserCreationForm
     template_name = "vault/register.html"
     success_url = reverse_lazy("login")
+
+
+@login_required
+def refresh_prices(request):
+    if request.method == "POST":
+        refresh_prices_for_user(request.user)
+    return redirect("card-list")
 
 
 # ----------------------------------test helper

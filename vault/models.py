@@ -76,9 +76,11 @@ class Card(models.Model):
 
 
 class PriceSnapshot(models.Model):
-    card = models.ForeignKey("Card", on_delete=models.CASCADE, related_name="price_snapshots")
+    card = models.ForeignKey(
+        "Card", on_delete=models.CASCADE, related_name="price_snapshots"
+    )
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    as_of_date = models.DateTimeField(default=timezone.localdate)
+    as_of_date = models.DateField(default=timezone.localdate)
     source = models.CharField(max_length=50, blank=True, default="")
     currency = models.CharField(max_length=10, blank=True, default="USD")
 
@@ -89,8 +91,6 @@ class PriceSnapshot(models.Model):
         # Only allow one price per day (hopefully help with rate limiting)
         constraints = [
             models.UniqueConstraint(
-                fields=["card", "as_of_date"],
-                name="uniq_card_price_per_day"
+                fields=["card", "as_of_date"], name="uniq_card_price_per_day"
             )
         ]
-
