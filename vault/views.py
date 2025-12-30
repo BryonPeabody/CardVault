@@ -9,7 +9,12 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Sum
 from django.db.models.functions import Coalesce
-from .utils import fetch_card_data, fetch_card_price, extract_card_price, refresh_prices_for_user
+from .utils import (
+    fetch_card_data,
+    fetch_card_price,
+    extract_card_price,
+    refresh_prices_for_user,
+)
 from django.conf import settings
 from django.http import JsonResponse, HttpResponse
 from decimal import Decimal

@@ -76,7 +76,7 @@ def fetch_card_data(
     }
 
 
-def fetch_card_price(card_name: str, set_name: str, fetch_all: bool = False):
+def fetch_card_price(card_name: str, set_name: str):
     # the price API requires a key hidden in .env
     api_key = getattr(settings, "CARDVAULT_API_KEY", None)
     # if someone uses this on github and cannot access my key this will fail gracefully unless they add their own
@@ -92,11 +92,7 @@ def fetch_card_price(card_name: str, set_name: str, fetch_all: bool = False):
     # hit the API passing headers and params to access
     url = "https://www.pokemonpricetracker.com/api/v2/cards"
     headers = {"Authorization": f"Bearer {api_key}"}
-    params = {"set": set_code}
-    if fetch_all:
-        params["fetchAllInSet"] = "true"
-    elif card_name:
-        params["search"] = card_name
+    params = {"set": set_code, "search": card_name}
 
     try:
         resp = requests.get(url, headers=headers, params=params, timeout=10)
@@ -149,49 +145,52 @@ def refresh_prices_for_user(user) -> int:
     today = timezone.localdate()
     cards = Card.objects.filter(user=user)
 
-    # group cards by set_name
-    cards_by_set = defaultdict(list)
-    for card in cards:
-        cards_by_set[card.set_name].append(card)
-
     updated = 0
 
-    for set_name, cards_in_set in cards_by_set.items():
-        # fetch once per set
-        # pick any card name just to seed the search
-        seed_card = cards_in_set[0]
-        data = fetch_card_price(seed_card.card_name, set_name, fetch_all=True)
+    for card in cards:
+        if card.price_last_updated == today:
+            continue
+        data = fetch_card_price(card.card_name, card.set_name)
 
         if "error" in data:
             logger.warning(
-                "Fetch card price failed for set=%s seed_name=%s status=%s error=%s",
-                set_name,
-                seed_card.card_name,
+                "Fetch card price failed for %s %s #%s status=%s error=%s",
+                card.card_name,
+                card.set_name,
+                card.card_number,
                 data.get("status"),
                 data.get("error"),
             )
             continue
 
-        for card in cards_in_set:
-            result = extract_card_price(data, card.card_number)
+        result = extract_card_price(data, card.card_number)
 
-            if "error" in result:
-                logger.warning("Price extract failed for %s %s #%s: %s",
-                               card.card_name, card.set_name, card.card_number, result["error"])
-                continue
-
-            price = Decimal(str(result["price"]))
-
-            PriceSnapshot.objects.update_or_create(
-                card=card,
-                as_of_date=today,
-                defaults={"price": price},
+        if "error" in result:
+            logger.warning(
+                "Price extract failed for %s %s #%s: %s",
+                card.card_name,
+                card.set_name,
+                card.card_number,
+                result["error"],
             )
+            continue
 
-            card.value_usd = price
-            card.price_last_updated = today
-            card.save(update_fields=["value_usd", "price_last_updated"])
+        price = Decimal(str(result["price"]))
 
-            updated += 1
+        PriceSnapshot.objects.update_or_create(
+            card=card,
+            as_of_date=today,
+            defaults={
+                "price": price,
+                "source": "pokemonpricetracker",
+                "currency": "USD",
+            },
+        )
+
+        card.value_usd = price
+        card.price_last_updated = today
+        card.save(update_fields=["value_usd", "price_last_updated"])
+
+        updated += 1
 
     return updated

@@ -14,5 +14,4 @@ urlpatterns = [
     path("update/<int:pk>/", CardUpdateView.as_view(), name="card-update"),
     path("delete/<int:pk>/", CardDeleteView.as_view(), name="card-delete"),
     path("refresh-prices/", refresh_prices, name="refresh-prices"),
-
 ]
