@@ -94,3 +94,6 @@ class PriceSnapshot(models.Model):
                 fields=["card", "as_of_date"], name="uniq_card_price_per_day"
             )
         ]
+
+    def __str__(self):
+        return f"{self.card.card_name} - ${self.price} on {self.as_of_date}"
