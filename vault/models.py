@@ -46,7 +46,7 @@ class Card(models.Model):
     card_name = models.CharField(max_length=50)
     set_name = models.CharField(max_length=25, choices=SET_CHOICES)
     language = models.CharField(max_length=2, choices=LANGUAGE_CHOICES)
-    card_number = models.CharField(max_length=10)
+    card_number = models.CharField(max_length=3)
     condition = models.CharField(max_length=2, choices=CONDITION_CHOICES)
 
     image_url = models.URLField(blank=True, null=True)
