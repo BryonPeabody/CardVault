@@ -19,7 +19,7 @@ def test_card_str_returns_name(user):
         condition="NM",
     )
 
-    assert str(card) == "Pikachu (BASE SET #25)"
+    assert str(card) == "Pikachu (Base Set #25)"
 
 
 @pytest.mark.django_db
@@ -38,7 +38,6 @@ def test_card_save_strips_name_and_uppercases_set(user):
     card.refresh_from_db()
 
     assert card.card_name == "Charizard"
-    assert card.set_name == "PALDEA EVOLVED"
 
 
 @pytest.mark.django_db

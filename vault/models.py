@@ -46,7 +46,7 @@ class Card(models.Model):
     card_name = models.CharField(max_length=50)
     set_name = models.CharField(max_length=25, choices=SET_CHOICES)
     language = models.CharField(max_length=2, choices=LANGUAGE_CHOICES)
-    card_number = models.CharField(max_length=10)
+    card_number = models.CharField(max_length=3)
     condition = models.CharField(max_length=2, choices=CONDITION_CHOICES)
 
     image_url = models.URLField(blank=True, null=True)
@@ -57,7 +57,6 @@ class Card(models.Model):
 
     def save(self, *args, **kwargs):
         self.card_name = self.card_name.strip()
-        self.set_name = self.set_name.upper()
         super().save(*args, **kwargs)
 
     def clean(self):
@@ -74,3 +73,27 @@ class Card(models.Model):
 
     def __str__(self):
         return f"{self.card_name} ({self.set_name} #{self.card_number})"
+
+
+class PriceSnapshot(models.Model):
+    card = models.ForeignKey(
+        "Card", on_delete=models.CASCADE, related_name="price_snapshots"
+    )
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    as_of_date = models.DateField(default=timezone.localdate)
+    source = models.CharField(max_length=50, blank=True, default="")
+    currency = models.CharField(max_length=10, blank=True, default="USD")
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["card", "-as_of_date"]),
+        ]
+        # Only allow one price per day (hopefully help with rate limiting)
+        constraints = [
+            models.UniqueConstraint(
+                fields=["card", "as_of_date"], name="uniq_card_price_per_day"
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.card.card_name} - ${self.price} on {self.as_of_date}"
