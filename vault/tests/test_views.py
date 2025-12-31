@@ -108,15 +108,16 @@ def test_card_create_view_creates_card(monkeypatch, user):
     def fake_fetch_card_data(card_name, set_name, card_number):
         return {"image_url": "https://example.com/fake.jpg"}
 
+    monkeypatch.setattr("vault.views.fetch_card_data", fake_fetch_card_data)
+
     def fake_fetch_card_price(card_name, set_name):
         return {"data": [{"price": 10.50, "date": "2025-11-05"}]}
 
     def fake_extract_card_price(data, card_number):
         return {"price": 10.50, "price_date": "2025-11-05"}
 
-    monkeypatch.setattr("vault.views.fetch_card_data", fake_fetch_card_data)
-    monkeypatch.setattr("vault.views.fetch_card_price", fake_fetch_card_price)
-    monkeypatch.setattr("vault.views.extract_card_price", fake_extract_card_price)
+    monkeypatch.setattr("vault.forms.fetch_card_price", fake_fetch_card_price)
+    monkeypatch.setattr("vault.forms.extract_card_price", fake_extract_card_price)
 
     # Post valid form data
     form_data = {

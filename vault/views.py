@@ -35,24 +35,9 @@ class CardCreateView(LoginRequiredMixin, CreateView):
             form.instance.set_name,
             form.instance.card_number,
         )
-
         form.instance.image_url = card_data.get("image_url")
 
-        # debug: see what im sending
-        print("sending card_name:", form.instance.card_name)
-        print("sending set_name:", form.instance.set_name)
-        print("sending card_number", form.instance.card_number)
-        price_api_data = fetch_card_price(
-            form.instance.card_name, form.instance.set_name
-        )
-        # debug: check api response
-        # print("raw price api data:", price_api_data)
-        print("data key present:", "data" in price_api_data)
-        print("data length:", len(price_api_data.get("data", [])))
-        parsed = extract_card_price(
-            price_api_data,
-            form.instance.card_number,
-        )
+        parsed = getattr(form, "cleaned_price", None)
         if parsed and "price" in parsed:
             form.instance.value_usd = parsed["price"]
             form.instance.price_last_updated = parsed["price_date"]
