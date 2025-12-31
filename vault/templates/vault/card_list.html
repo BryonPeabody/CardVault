@@ -12,6 +12,7 @@
         </button>
     </form>
 
+    <a href="{% url 'card-create' %}">Add a card to your vault</a>
 
     <form method="get" class="sort-form">
         <label for="sort"><strong>Sort:</strong></label>
@@ -58,7 +59,5 @@
             </div>
         {% endfor %}
     </div>
-
-    <a href="{% url 'card-create' %}">Add a card to your vault</a>
 
 {% endblock %}
