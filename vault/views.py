@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from .models import Card
-from .forms import CardForm
+from .forms import CardForm, CardUpdateForm
 from django.views.generic import CreateView, UpdateView, DeleteView, ListView
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -84,7 +84,7 @@ class CardListView(LoginRequiredMixin, ListView):
 
 class CardUpdateView(LoginRequiredMixin, UpdateView):
     model = Card
-    form_class = CardForm
+    form_class = CardUpdateForm
     template_name = "vault/card_form.html"
     success_url = reverse_lazy("card-list")
 
@@ -93,16 +93,6 @@ class CardUpdateView(LoginRequiredMixin, UpdateView):
 
     def form_valid(self, form):
         form.instance.user = self.request.user
-
-        card_data = fetch_card_data(
-            card_name=form.cleaned_data.get("card_name"),
-            set_name=form.cleaned_data.get("set_name"),
-            card_number=form.cleaned_data.get("card_number"),
-        )
-
-        if card_data:
-            form.instance.image_url = card_data.get("image_url")
-
         return super().form_valid(form)
 
 

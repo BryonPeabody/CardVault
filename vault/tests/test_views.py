@@ -164,12 +164,10 @@ def test_card_update_view_redirects_non_logged_in_user(user):
 
 
 @pytest.mark.django_db
-def test_card_update_view_updates_a_card(user):
-    """Ensure a logged in user can update a card in the database"""
+def test_card_update_view_updates_only_condition(user):
     client = Client()
     client.force_login(user)
 
-    # Create original card
     card = Card.objects.create(
         user=user,
         card_name="Bulbasaur",
@@ -179,30 +177,29 @@ def test_card_update_view_updates_a_card(user):
         condition="M",
     )
 
-    # Get to update screen on the created card
     url = reverse("card-update", args=[card.pk])
 
-    # Set data for updated card
-    updated_data = {
-        "card_name": "Pikachu",
-        "set_name": "151",
-        "language": "EN",
-        "card_number": "10",
-        "condition": "NM",
-    }
+    response = client.post(
+        url,
+        data={
+            "condition": "LP",
+            # Only condition should be able to update
+            "card_name": "Pikachu",
+            "set_name": "Base",
+            "card_number": "10",
+            "language": "JP",
+        },
+    )
 
-    # Post updated data to the update url
-    response = client.post(url, data=updated_data)
-
-    # Ensure expected redirect
     assert response.status_code == 302
     assert response.url == reverse("card-list")
 
-    # Ensure card is updated in database
     card.refresh_from_db()
-    assert card.card_name == "Pikachu"
-    assert card.card_number == "10"
-    assert card.condition == "NM"
+    assert card.condition == "LP"
+    assert card.card_name == "Bulbasaur"
+    assert card.set_name == "151"
+    assert card.card_number == "1"
+    assert card.language == "EN"
 
 
 @pytest.mark.django_db

@@ -41,3 +41,9 @@ class CardForm(forms.ModelForm):
         # Cache parsed result so the view can reuse it without another API call
         self.cleaned_price = parsed  # e.g. {"price": ..., "price_date": ...}
         return cleaned
+
+
+class CardUpdateForm(forms.ModelForm):
+    class Meta:
+        model = Card
+        fields = ["condition"]
