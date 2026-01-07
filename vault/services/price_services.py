@@ -11,6 +11,23 @@ from vault.services.image_services import get_card_image_url_or_placeholder
 logger = logging.getLogger(__name__)
 
 
+def create_initial_snapshot(card):
+    if card.value_usd is None:
+        return False
+
+    today = timezone.localdate()
+    PriceSnapshot.objects.update_or_create(
+        card=card,
+        as_of_date=today,
+        defaults={
+            "price": card.value_usd,
+            "source": "pokemonpricetracker",
+            "currency": "USD",
+        },
+    )
+    return True
+
+
 def refresh_prices_for_user(user) -> int:
     today = timezone.localdate()
     cards = Card.objects.filter(user=user)
