@@ -1,6 +1,6 @@
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
-from .models import Card
+from .models import Card, PriceSnapshot
 from .forms import CardForm, CardUpdateForm
 from django.views.generic import CreateView, UpdateView, DeleteView, ListView
 from django.contrib.auth.forms import UserCreationForm
@@ -15,6 +15,10 @@ from vault.services.price_services import (
     refresh_prices_for_user,
     create_initial_snapshot,
 )
+from datetime import timedelta
+from django.http import JsonResponse
+from django.utils import timezone
+from django.views.generic import TemplateView
 
 
 class CardCreateView(LoginRequiredMixin, CreateView):
@@ -106,6 +110,52 @@ class RegisterView(CreateView):
     form_class = UserCreationForm
     template_name = "vault/register.html"
     success_url = reverse_lazy("login")
+
+
+################## PriceSnapshot Views ####################
+
+
+@login_required
+def collection_value_series(request):
+    range_key = request.GET.get("range", "30d").lower()
+    today = timezone.localdate()
+
+    if range_key == "30d":
+        start = today - timedelta(days=29)
+    elif range_key == "90d":
+        start = today - timedelta(days=89)
+    elif range_key in ("1y", "365d", "year"):
+        start = today - timedelta(days=364)
+    elif range_key == "all":
+        start = None
+    else:
+        # fallback
+        start = today - timedelta(days=29)
+
+    qs = PriceSnapshot.objects.filter(card__user=request.user)
+
+    if start is not None:
+        qs = qs.filter(as_of_date__gte=start)
+
+    rows = qs.values("as_of_date").annotate(total=Sum("price")).order_by("as_of_date")
+
+    data = [
+        {
+            {"date": r["as_of_date"].isoformat(), "value": str(r["total"] or 0)}
+            for r in rows
+        }
+    ]
+
+    return JsonResponse(data, safe=False)
+
+
+class CollectionGraphView(LoginRequiredMixin, TemplateView):
+    template_name = "vault/collection_graph.html"
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx["range"] = self.request.GET.get("range", "30d")
+        return ctx
 
 
 @login_required
