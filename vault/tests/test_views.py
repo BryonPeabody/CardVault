@@ -105,10 +105,13 @@ def test_card_create_view_creates_card(monkeypatch, user):
     client.force_login(user)
 
     # Mock helper function so testing does not hit apis
-    def fake_fetch_card_data(card_name, set_name, card_number):
-        return {"image_url": "https://example.com/fake.jpg"}
+    def get_card_image_url_or_placeholder(*, card_name, set_name, card_number):
+        return "https://example.com/fake.jpg"
 
-    monkeypatch.setattr("vault.views.fetch_card_data", fake_fetch_card_data)
+    monkeypatch.setattr(
+        "vault.views.get_card_image_url_or_placeholder",
+        get_card_image_url_or_placeholder,
+    )
 
     def fake_fetch_card_price(card_name, set_name):
         return {"data": [{"price": 10.50, "date": "2025-11-05"}]}

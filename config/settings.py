@@ -150,3 +150,5 @@ LOGOUT_REDIRECT_URL = "login"
 CARDVAULT_API_KEY = os.getenv("CARDVAULT_API_KEY")
 
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
+CARD_IMAGE_PLACEHOLDER_URL = "/static/vault/image/card-placeholder.png"
