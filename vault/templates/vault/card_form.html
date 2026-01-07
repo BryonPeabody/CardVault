@@ -6,4 +6,5 @@
         {% csrf_token %}
         <button type="submit">Add to Vault</button>
     </form>
+    <a href="{% url 'card-list' %}">Back to vault</a>
 {% endblock %}

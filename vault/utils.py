@@ -1,16 +1,9 @@
 import requests
 from django.conf import settings
-from datetime import datetime
 import logging
 
 from .constants import IMAGE_SET_MAP, PRICE_SET_MAP
 
-# Price history imports
-from django.utils import timezone
-from decimal import Decimal
-from collections import defaultdict
-
-from .models import Card, PriceSnapshot
 
 logger = logging.getLogger(__name__)
 
@@ -139,58 +132,3 @@ def extract_card_price(data: dict, card_number: str | int):
             continue
 
     return {"error": f"Card number {padded} not found"}
-
-
-def refresh_prices_for_user(user) -> int:
-    today = timezone.localdate()
-    cards = Card.objects.filter(user=user)
-
-    updated = 0
-
-    for card in cards:
-        if card.price_last_updated == today:
-            continue
-        data = fetch_card_price(card.card_name, card.set_name)
-
-        if "error" in data:
-            logger.warning(
-                "Fetch card price failed for %s %s #%s status=%s error=%s",
-                card.card_name,
-                card.set_name,
-                card.card_number,
-                data.get("status"),
-                data.get("error"),
-            )
-            continue
-
-        result = extract_card_price(data, card.card_number)
-
-        if "error" in result:
-            logger.warning(
-                "Price extract failed for %s %s #%s: %s",
-                card.card_name,
-                card.set_name,
-                card.card_number,
-                result["error"],
-            )
-            continue
-
-        price = Decimal(str(result["price"]))
-
-        PriceSnapshot.objects.update_or_create(
-            card=card,
-            as_of_date=today,
-            defaults={
-                "price": price,
-                "source": "pokemonpricetracker",
-                "currency": "USD",
-            },
-        )
-
-        card.value_usd = price
-        card.price_last_updated = today
-        card.save(update_fields=["value_usd", "price_last_updated"])
-
-        updated += 1
-
-    return updated

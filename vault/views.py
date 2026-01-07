@@ -1,24 +1,20 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from .models import Card
-from .forms import CardForm
+from .forms import CardForm, CardUpdateForm
 from django.views.generic import CreateView, UpdateView, DeleteView, ListView
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
-from django.contrib import messages
 from django.db.models import Sum
 from django.db.models.functions import Coalesce
-from .utils import (
-    fetch_card_data,
-    fetch_card_price,
-    extract_card_price,
-    refresh_prices_for_user,
-)
-from django.conf import settings
-from django.http import JsonResponse, HttpResponse
+from django.http import HttpResponse
 from decimal import Decimal
-import requests
+from vault.services.image_services import get_card_image_url_or_placeholder
+from vault.services.price_services import (
+    refresh_prices_for_user,
+    create_initial_snapshot,
+)
 
 
 class CardCreateView(LoginRequiredMixin, CreateView):
@@ -30,34 +26,20 @@ class CardCreateView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         form.instance.user = self.request.user
 
-        card_data = fetch_card_data(
-            form.instance.card_name,
-            form.instance.set_name,
-            form.instance.card_number,
+        form.instance.image_url = get_card_image_url_or_placeholder(
+            card_name=form.instance.card_name,
+            set_name=form.instance.set_name,
+            card_number=form.instance.card_number,
         )
 
-        form.instance.image_url = card_data.get("image_url")
-
-        # debug: see what im sending
-        print("sending card_name:", form.instance.card_name)
-        print("sending set_name:", form.instance.set_name)
-        print("sending card_number", form.instance.card_number)
-        price_api_data = fetch_card_price(
-            form.instance.card_name, form.instance.set_name
-        )
-        # debug: check api response
-        # print("raw price api data:", price_api_data)
-        print("data key present:", "data" in price_api_data)
-        print("data length:", len(price_api_data.get("data", [])))
-        parsed = extract_card_price(
-            price_api_data,
-            form.instance.card_number,
-        )
+        parsed = getattr(form, "cleaned_price", None)
         if parsed and "price" in parsed:
             form.instance.value_usd = parsed["price"]
             form.instance.price_last_updated = parsed["price_date"]
 
-        return super().form_valid(form)
+        response = super().form_valid(form)
+        create_initial_snapshot(self.object)
+        return response
 
 
 class CardListView(LoginRequiredMixin, ListView):
@@ -99,7 +81,7 @@ class CardListView(LoginRequiredMixin, ListView):
 
 class CardUpdateView(LoginRequiredMixin, UpdateView):
     model = Card
-    form_class = CardForm
+    form_class = CardUpdateForm
     template_name = "vault/card_form.html"
     success_url = reverse_lazy("card-list")
 
@@ -108,16 +90,6 @@ class CardUpdateView(LoginRequiredMixin, UpdateView):
 
     def form_valid(self, form):
         form.instance.user = self.request.user
-
-        card_data = fetch_card_data(
-            card_name=form.cleaned_data.get("card_name"),
-            set_name=form.cleaned_data.get("set_name"),
-            card_number=form.cleaned_data.get("card_number"),
-        )
-
-        if card_data:
-            form.instance.image_url = card_data.get("image_url")
-
         return super().form_valid(form)
 
 
