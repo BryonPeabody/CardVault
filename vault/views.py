@@ -11,7 +11,10 @@ from django.db.models.functions import Coalesce
 from django.http import HttpResponse
 from decimal import Decimal
 from vault.services.image_services import get_card_image_url_or_placeholder
-from vault.services.price_services import refresh_prices_for_user, create_initial_snapshot
+from vault.services.price_services import (
+    refresh_prices_for_user,
+    create_initial_snapshot,
+)
 
 
 class CardCreateView(LoginRequiredMixin, CreateView):
