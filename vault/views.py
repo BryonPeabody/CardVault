@@ -140,10 +140,8 @@ def collection_value_series(request):
     rows = qs.values("as_of_date").annotate(total=Sum("price")).order_by("as_of_date")
 
     data = [
-        {
-            {"date": r["as_of_date"].isoformat(), "value": str(r["total"] or 0)}
-            for r in rows
-        }
+        {"date": r["as_of_date"].isoformat(), "value": str(r["total"] or 0)}
+        for r in rows
     ]
 
     return JsonResponse(data, safe=False)

@@ -1,0 +1,36 @@
+<!-- templates/vault/collection_graph.html -->
+<h1>Collection Value</h1>
+
+<div>
+  <a href="?range=30d">30D</a>
+  <a href="?range=90d">90D</a>
+  <a href="?range=1y">1Y</a>
+  <a href="?range=all">ALL</a>
+</div>
+
+<canvas id="collectionChart"></canvas>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  const range = "{{ range|escapejs }}";
+
+  fetch(`/cards/api/collection-value-series/?range=${range}`)
+    .then(r => r.json())
+    .then(points => {
+      const labels = points.map(p => p.date);
+      const values = points.map(p => Number(p.value));
+
+      const ctx = document.getElementById("collectionChart");
+      new Chart(ctx, {
+        type: "line",
+        data: {
+          labels,
+          datasets: [{
+            label: "Total Value (USD)",
+            data: values,
+            tension: 0.25
+          }]
+        }
+      });
+    });
+</script>
