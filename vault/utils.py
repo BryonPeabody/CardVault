@@ -26,7 +26,7 @@ def fetch_card_data(
     # graceful exit if set_code not found
     if not set_code:
         logger.error("Missing IMAGE_SET_MAP code for set '%s'", set_name)
-        return {}
+        return {"error": "Invalid set"}
     # hit api to grab a json list of cards with the name from model
     try:
         url = "https://api.tcgdex.net/v2/en/cards"
@@ -38,7 +38,7 @@ def fetch_card_data(
         data = resp.json() or []  # list
     except Exception as e:
         logger.exception("TCGdex request failed: %s", e)
-        return {}
+        return {"error": "Service unavailable"}
     # use list comprehension to save only cards that have that name and also the correct set_code
     prefix = f"{set_code.lower()}-"
     candidates = [c for c in data if c.get("id", "").lower().startswith(prefix)]
@@ -58,7 +58,7 @@ def fetch_card_data(
     candidates = [c for c in candidates if c.get("image")]
     # graceful exit if no matches found
     if not candidates:
-        return {}
+        return {"error": "No matching cards in return"}
     # this list should only have one match by now but in case not we'll take the first item
     card = candidates[0]
     # return the information
