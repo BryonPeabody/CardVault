@@ -2,7 +2,7 @@
 
 
 import pytest
-from vault.forms import CardForm, CardUpdateForm
+from vault.forms import CardForm
 
 
 @pytest.mark.django_db

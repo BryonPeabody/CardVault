@@ -5,7 +5,10 @@ from decimal import Decimal
 from django.utils import timezone
 
 from vault.models import Card, PriceSnapshot
-from vault.services.price_services import refresh_prices_for_user, create_initial_snapshot
+from vault.services.price_services import (
+    refresh_prices_for_user,
+    create_initial_snapshot,
+)
 
 
 @pytest.mark.django_db
@@ -54,7 +57,7 @@ def test_refresh_skips_cards_with_current_price_data(
     mock_fetch_price,
     user,
 ):
-    card = Card.objects.create(
+    _ = Card.objects.create(
         user=user,
         card_name="Pikachu",
         set_name="151",
@@ -81,7 +84,7 @@ def test_refresh_skips_cards_where_fetch_price_returns_error(
     mock_fetch_price,
     user,
 ):
-    card = Card.objects.create(
+    _ = Card.objects.create(
         user=user,
         card_name="Pikachu",
         set_name="151",
@@ -258,7 +261,7 @@ def test_create_initial_snapshot_saves_expected_snapshot_data(user):
         language="EN",
         card_number="58",
         condition="NM",
-        value_usd="12.84"
+        value_usd="12.84",
     )
 
     assert create_initial_snapshot(card)
@@ -271,4 +274,3 @@ def test_create_initial_snapshot_saves_expected_snapshot_data(user):
     assert snapshot.source == "pokemonpricetracker"
     assert snapshot.currency == "USD"
     assert snapshot.as_of_date == timezone.localdate()
-
