@@ -35,7 +35,12 @@ Core is functionally complete. The application is stable and fully tested
 - Current card value is denormalized for fast list and aggregation queries.
 - Business logic is handled in a service layer to keep views thin and testable.
 
+## Requirements
+- Python 3.9 +
+- PostgreSQL
+- Docker (optional, recommended)
 
+  
 ## Running Locally
 Clone the repository, set up a virtual environment, configure environment variables, and start the development server:
 
@@ -72,4 +77,5 @@ docker run -d -p 8000:8000 cardvault
 ```bash
 docker compose up --build
 ```
+
 
