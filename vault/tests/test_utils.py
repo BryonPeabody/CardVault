@@ -1,9 +1,7 @@
 # Test helper functions
 
 
-import pytest
 from vault.utils import _pad_card_number_for_image, extract_card_price
-from datetime import date
 
 
 def test_pad_card_number_for_image():

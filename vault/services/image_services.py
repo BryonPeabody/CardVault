@@ -1,5 +1,6 @@
 import logging
 from django.conf import settings
+from vault.utils import fetch_card_data
 
 logger = logging.getLogger(__name__)
 
@@ -7,7 +8,6 @@ logger = logging.getLogger(__name__)
 def get_card_image_url_or_placeholder(
     *, card_name: str, set_name: str, card_number: str
 ) -> str:
-    from vault.utils import fetch_card_data
 
     try:
         data = fetch_card_data(card_name, set_name, card_number)

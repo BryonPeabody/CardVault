@@ -1,24 +1,36 @@
+# Standard library
+from datetime import timedelta
+from decimal import Decimal
+import logging
+
+# Django
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
-from .models import Card, PriceSnapshot
-from .forms import CardForm, CardUpdateForm
-from django.views.generic import CreateView, UpdateView, DeleteView, ListView
+from django.views.generic import (
+    CreateView,
+    UpdateView,
+    DeleteView,
+    ListView,
+    TemplateView,
+)
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.db.models import Sum
 from django.db.models.functions import Coalesce
-from django.http import HttpResponse
-from decimal import Decimal
+from django.http import HttpResponse, JsonResponse
+from django.utils import timezone
+
+# Local app
+from .models import Card, PriceSnapshot
+from .forms import CardForm, CardUpdateForm
 from vault.services.image_services import get_card_image_url_or_placeholder
 from vault.services.price_services import (
     refresh_prices_for_user,
     create_initial_snapshot,
 )
-from datetime import timedelta
-from django.http import JsonResponse
-from django.utils import timezone
-from django.views.generic import TemplateView
+
+logger = logging.getLogger(__name__)
 
 
 class CardCreateView(LoginRequiredMixin, CreateView):
@@ -112,7 +124,7 @@ class RegisterView(CreateView):
     success_url = reverse_lazy("login")
 
 
-################## PriceSnapshot Views ####################
+# ----------------------- PriceSnapshot Views --------------------
 
 
 @login_required

@@ -4,7 +4,8 @@
 import pytest
 from django.core.exceptions import ValidationError
 from django.utils import timezone
-from vault.models import Card
+from vault.models import Card, PriceSnapshot
+from django.db.utils import IntegrityError
 
 
 @pytest.mark.django_db
@@ -66,3 +67,51 @@ def test_card_clean_prevents_duplicate_cards(user):
         duplicate.clean()
 
     assert "already exists" in str(excinfo.value)
+
+
+@pytest.mark.django_db
+def test_price_snapshot_only_one_price_per_card_per_day(user_card):
+    card = user_card
+
+    PriceSnapshot.objects.create(
+        card=card,
+        price=11.00,
+        as_of_date=timezone.localdate(),
+    )
+
+    with pytest.raises(IntegrityError):
+        PriceSnapshot.objects.create(
+            card=card,
+            price=10.00,
+            as_of_date=timezone.localdate(),
+        )
+
+
+@pytest.mark.django_db
+def test_price_snapshot_defaults_to_today(user_card):
+    snapshot = PriceSnapshot.objects.create(
+        card=user_card,
+        price=12.34,
+    )
+
+    assert snapshot.as_of_date == timezone.localdate()
+
+
+@pytest.mark.django_db
+def test_price_snapshot_str(user):
+    card = Card.objects.create(
+        user=user,
+        card_name="Pikachu",
+        set_name="151",
+        language="EN",
+        card_number="25",
+        condition="NM",
+    )
+
+    snapshot = PriceSnapshot.objects.create(
+        card=card,
+        price=12.50,
+        as_of_date=timezone.localdate(),
+    )
+
+    assert str(snapshot) == f"Pikachu - $12.5 on {timezone.localdate()}"

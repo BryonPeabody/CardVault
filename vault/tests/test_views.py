@@ -3,9 +3,13 @@
 
 import pytest
 from django.urls import reverse
-from django.contrib.auth.models import User
 from django.test import Client
-from vault.models import Card
+from django.utils import timezone
+from decimal import Decimal
+from datetime import timedelta
+from unittest.mock import patch
+from vault.models import Card, PriceSnapshot
+
 
 """ 
     When creating a card for tests, the set_name must be one of the sets listed in the constants.py file
@@ -321,3 +325,189 @@ def test_user_cant_delete_different_users_card(user):
     # Ensure delete post fails
     assert response.status_code == 404
     assert Card.objects.filter(pk=foreign_card.pk).exists()
+
+
+# ------------------ collection value series tests
+
+
+@pytest.mark.django_db
+def test_collection_value_series_requires_login():
+    client = Client()
+
+    url = reverse("collection-value-series")
+    response = client.get(url)
+
+    assert response.status_code == 302
+    assert "/login" in response.url
+
+
+@pytest.mark.django_db
+def test_user_with_no_price_snapshots_returns_empty(user):
+    client = Client()
+    client.force_login(user)
+
+    url = reverse("collection-value-series")
+    response = client.get(url)
+
+    assert response.status_code == 200
+    assert response.json() == []
+
+
+@pytest.mark.django_db
+def test_value_series_returns_aggregated_data_for_user_and_ignores_other_user_data(
+    user, other_user
+):
+    client = Client()
+    client.force_login(user)
+
+    today = timezone.localdate()
+
+    # ----- User's cards -----
+    card1 = Card.objects.create(
+        user=user,
+        card_name="Pikachu",
+        set_name="151",
+        language="EN",
+        card_number="25",
+        condition="NM",
+    )
+
+    card2 = Card.objects.create(
+        user=user,
+        card_name="Bulbasaur",
+        set_name="151",
+        language="EN",
+        card_number="1",
+        condition="NM",
+    )
+
+    PriceSnapshot.objects.create(
+        card=card1,
+        as_of_date=today,
+        price=Decimal("10.00"),
+        source="test",
+        currency="USD",
+    )
+
+    PriceSnapshot.objects.create(
+        card=card2,
+        as_of_date=today,
+        price=Decimal("5.00"),
+        source="test",
+        currency="USD",
+    )
+
+    # ----- Other user's data (should be ignored) -----
+    other_card = Card.objects.create(
+        user=other_user,
+        card_name="Charmander",
+        set_name="151",
+        language="EN",
+        card_number="4",
+        condition="NM",
+    )
+
+    PriceSnapshot.objects.create(
+        card=other_card,
+        as_of_date=today,
+        price=Decimal("100.00"),
+        source="test",
+        currency="USD",
+    )
+
+    url = reverse("collection-value-series")
+    response = client.get(url)
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert len(data) == 1
+    assert data[0]["date"] == today.isoformat()
+    assert Decimal(data[0]["value"]) == Decimal("15.00")
+
+
+@pytest.mark.django_db
+def test_value_series_respects_range_override(user):
+    client = Client()
+    client.force_login(user)
+
+    today = timezone.localdate()
+    old_date = today - timedelta(days=60)
+
+    card = Card.objects.create(
+        user=user,
+        card_name="Pikachu",
+        set_name="151",
+        language="EN",
+        card_number="25",
+        condition="NM",
+    )
+
+    PriceSnapshot.objects.create(
+        card=card,
+        as_of_date=old_date,
+        price=Decimal("20.00"),
+        source="test",
+        currency="USD",
+    )
+
+    url = reverse("collection-value-series")
+
+    # ---- Default range (30d) should exclude snapshot ----
+    response = client.get(url)
+    assert response.status_code == 200
+    assert response.json() == []
+
+    # ---- Expanded range (90d) should include snapshot ----
+    response = client.get(f"{url}?range=90d")
+    data = response.json()
+
+    assert len(data) == 1
+    assert data[0]["date"] == old_date.isoformat()
+    assert Decimal(data[0]["value"]) == Decimal("20.00")
+
+
+# -------------------- Collection graph view tests --------
+
+
+def test_collection_graph_requires_login(client):
+    response = client.get(reverse("collection-graph"))
+    assert response.status_code == 302
+
+
+def test_collection_graph_default_range(user):
+    client = Client()
+    client.force_login(user)
+    response = client.get(reverse("collection-graph"))
+    assert response.context["range"] == "30d"
+
+
+def test_collection_graph_custom_range(user):
+    client = Client()
+    client.force_login(user)
+    response = client.get(reverse("collection-graph") + "?range=90d")
+    assert response.context["range"] == "90d"
+
+
+# ----------------- Refresh prices view tests -----
+
+
+@patch("vault.views.refresh_prices_for_user")
+def test_refresh_prices_post_calls_service(mock_refresh, client, user):
+    client.force_login(user)
+
+    response = client.post(reverse("refresh-prices"))
+
+    mock_refresh.assert_called_once_with(user)
+    assert response.status_code == 302
+
+
+@patch("vault.views.refresh_prices_for_user")
+def test_refresh_prices_get_does_not_call_service(mock_refresh, client, user):
+    client.force_login(user)
+
+    response = client.get(reverse("refresh-prices"))
+
+    mock_refresh.assert_not_called()
+    assert response.status_code == 302

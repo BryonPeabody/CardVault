@@ -1,4 +1,3 @@
-import requests
 from django.conf import settings
 import logging
 from django.utils import timezone
