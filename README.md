@@ -39,6 +39,9 @@ Core is functionally complete. The application is stable and fully tested
 - Python 3.9 +
 - PostgreSQL
 - Docker (optional, recommended)
+- Full functionality uses external APIs for card images and pricing.
+  A free API key is required for price fetching:
+  https://www.pokemonpricetracker.com 
 
   
 ## Running Locally
@@ -77,5 +80,6 @@ docker run -d -p 8000:8000 cardvault
 ```bash
 docker compose up --build
 ```
+
 
 
