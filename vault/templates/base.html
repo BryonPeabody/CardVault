@@ -10,7 +10,16 @@
     <nav style="margin-bottom: 20px;">
         {% if user.is_authenticated %}
             <span>Welcome, {{ user.username }}!</span>
-            <form method="post" action="{% url 'logout' %}" style="display:inline;">
+
+            <a href="{% url 'card-list' %}" style="margin-left: 10px;">
+                Vault
+            </a>
+
+            <a href="{% url 'collection-graph' %}" style="margin-left: 10px;">
+                Portfolio
+            </a>
+
+            <form method="post" action="{% url 'logout' %}" style="display:inline; margin-left: 10px;">
                 {% csrf_token %}
                 <button type="submit">Logout</button>
             </form>
@@ -19,6 +28,7 @@
             <a href="{% url 'register' %}">Register</a>
         {% endif %}
     </nav>
+
 
 {% block content %}
 {% endblock %}

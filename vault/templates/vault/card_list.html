@@ -1,6 +1,20 @@
 {% extends "base.html" %}
 {% block content %}
     <h2>Card List</h2>
+
+    {% if not cards %}
+    <p class="intro-text">
+        Your vault is empty. Add your first card to start tracking value over time.
+    </p>
+    {% else %}
+    <p class="intro-text">
+    Your vault tracks your cards and their current market value.
+    Click <strong>Refresh prices</strong> to update pricing data.
+    <br>
+    <em>Note: This is version 1. If some cards don’t update immediately, try again later.</em>
+    </p>
+    {% endif %}
+
     <p class="collection-total">
         <strong>Total collection value:</strong>
         ${{ total_value_usd|floatformat:2 }}
@@ -11,6 +25,7 @@
             Refresh prices
         </button>
     </form>
+
 
     <a href="{% url 'card-create' %}">Add a card to your vault</a>
 
