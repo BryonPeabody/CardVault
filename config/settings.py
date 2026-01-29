@@ -30,7 +30,6 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", "False") == "True"
 
-DEBUG = os.getenv("DEBUG", "False") == "True"
 
 if not DEBUG:
     SECURE_BROWSER_XSS_FILTER = True
