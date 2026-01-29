@@ -60,8 +60,11 @@ class Card(models.Model):
         super().save(*args, **kwargs)
 
     def clean(self):
+        if not self.user_id:
+            return
         if (
             Card.objects.filter(
+                user=self.user,
                 card_name__iexact=self.card_name,
                 set_name__iexact=self.set_name,
                 card_number=self.card_number,
@@ -69,7 +72,7 @@ class Card(models.Model):
             .exclude(pk=self.pk)
             .exists()
         ):
-            raise ValidationError("This card already exists (case-insensitive match).")
+            raise ValidationError("You already have this card in your vault.")
 
     def __str__(self):
         return f"{self.card_name} ({self.set_name} #{self.card_number})"

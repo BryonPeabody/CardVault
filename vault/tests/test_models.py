@@ -66,7 +66,7 @@ def test_card_clean_prevents_duplicate_cards(user):
     with pytest.raises(ValidationError) as excinfo:
         duplicate.clean()
 
-    assert "already exists" in str(excinfo.value)
+    assert "You already have this card in your vault" in str(excinfo.value)
 
 
 @pytest.mark.django_db
